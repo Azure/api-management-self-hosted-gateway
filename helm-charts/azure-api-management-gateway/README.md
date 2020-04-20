@@ -7,7 +7,7 @@ We are using Helm v3.
 
 ```console
 helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
-helm install apim-gateway/azure-api-management-gateway
+helm install apim-gateway apim-gateway/azure-api-management-gateway
 ```
 
 ## Introduction
