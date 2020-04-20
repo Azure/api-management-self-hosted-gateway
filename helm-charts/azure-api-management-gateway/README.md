@@ -7,21 +7,19 @@ We are using Helm v3.
 
 ```console
 helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
-helm install apim-gateway apim-gateway/azure-api-management-gateway
+helm install azure-api-management-gateway apim-gateway/azure-api-management-gateway
 ```
 
 ## Introduction
 
-This chart bootstraps an **Azure API Management gateway** deployment on a Kubernetes cluster using the Helm package manager.
-
-It will automatically federate itself with the configured Azure API Management instance and be ready to be consumed.
+This chart bootstraps an **Azure API Management gateway** deployment on a Kubernetes cluster using the [Helm](https://helm.sh/) package manager.
 
 ## Prerequisites
 
 - Azure Subscription
 - Azure API Management instance
-    - A provisioned [self-hosted gateway](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-provision-self-hosted-gateway)
-    - Endpoint & authentication information required for deployment. See `Deployment` section in Azure Portal for created local gateway
+    - A provisioned [self-hosted gateway](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-provision-self-hosted-gateway) resource.
+    - Endpoint & authentication information required for deployment. See the `Deployment` section of the created gateway resource in Azure Portal.
 - [Helm 3](https://helm.sh/docs/intro/install/)
 
 
