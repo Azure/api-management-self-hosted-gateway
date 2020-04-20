@@ -3,10 +3,11 @@
 [Self-hosted Azure API Management gateway](https://docs.microsoft.com/en-us/azure/api-management/self-hosted-gateway-overview) allows you to run Azure API Management gateway anywhere - Any cloud, hybrid or on-premises.
 
 ## TL;DR
+We are using Helm v3.
 
 ```console
-helm repo add tomkerkhove https://tomkerkhove.azurecr.io/helm/v1/repo
-helm install tomkerkhove/azure-api-management-gateway
+helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+helm install apim-gateway/azure-api-management-gateway
 ```
 
 ## Introduction
@@ -21,22 +22,31 @@ It will automatically federate itself with the configured Azure API Management i
 - Azure API Management instance
     - A provisioned [self-hosted gateway](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-provision-self-hosted-gateway)
     - Endpoint & authentication information required for deployment. See `Deployment` section in Azure Portal for created local gateway
+- [Helm 3](https://helm.sh/docs/intro/install/)
 
-## Installing the Chart
+
+## Add the Repo
+To add the chart repository:
+
+```console
+helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+```
+
+## Install the Chart
 
 To install the chart with the release name `azure-api-management-gateway`:
 
 ```console
-helm install --name azure-api-management-gateway tomkerkhove/azure-api-management-gateway \
+helm install --name azure-api-management-gateway apim-gateway/azure-api-management-gateway \
              --set gateway.endpoint='<gateway-url>' \
              --set gateway.authKey='<gateway-key>'
 ```
 
 The command deploys the [Azure API Management gateway](https://docs.microsoft.com/en-us/azure/api-management/self-hosted-gateway-overview) on the Kubernetes cluster.
 
-## Uninstalling the Chart
+## Uninstall the Chart
 
-To uninstall/delete the `azure-api-management-gateway` deployment:
+To uninstall the `azure-api-management-gateway` deployment:
 
 ```console
 helm delete azure-api-management-gateway
@@ -72,5 +82,5 @@ Alternatively, a YAML file that specifies the values for the above parameters ca
 be provided while installing the chart. For example,
 
 ```console
-helm install tomkerkhove/azure-api-management-gateway --name azure-api-management-gateway -f values.yaml
+helm install apim-gateway/azure-api-management-gateway --name azure-api-management-gateway -f values.yaml
 ```
