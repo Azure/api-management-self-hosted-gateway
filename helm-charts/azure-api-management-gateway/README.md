@@ -55,7 +55,7 @@ deletes the release.
 
 ## Configuration
 
-The following table lists the configurable parameters of the Promitor chart and
+The following table lists the configurable parameters of the self-hosted Azure API Management gateway chart and
 their default values.
 
 | Parameter                  | Description              | Default              |
