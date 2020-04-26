@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-gateway-token
+type: Opaque
+stringData:
+  value: "paste token here"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: private-gateway-env
+data:
+  config.service.endpoint: "paste URL here"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: private-gateway
+  template:
+    metadata:
+      labels:
+        app: private-gateway
+    spec:
+      dnsPolicy: Default
+      containers:
+      - name: private-gateway
+        image: mcr.microsoft.com/azure-api-management/gateway:latest
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8081
+        env:
+        - name: config.service.auth
+          valueFrom:
+            secretKeyRef:
+              name: private-gateway-token
+              key: value
+        envFrom:
+        - configMapRef:
+            name: private-gateway-env
+      # create a volume linked to the pvc below and mount it in the container
+        volumeMounts:
+          - mountPath: /apim/config
+            name: private-gateway-volume
+      volumes:
+        - name: private-gateway-volume
+          persistentVolumeClaim:
+              claimName: private-gateway-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: private-gateway
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: 8081
+  selector:
+    app: private-gateway
+---
+# This claim binds to an existing or dynamically created persistent volume of sufficient size and default
+# StorageClass if one is configured for the cluster.
+# Consider explicitly defining persistent volume following best practices for your Kubernetes environment.
+# Go to https://kubernetes.io/docs/concepts/storage/ to learn about storage in Kubernetes.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: private-gateway-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi # Feel free to adjust up to avoid running out of space
