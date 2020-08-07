@@ -6,8 +6,8 @@
 We are using Helm v3.
 
 ```console
-helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
-helm install azure-api-management-gateway apim-gateway/azure-api-management-gateway
+helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+helm install azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway
 ```
 
 ## Introduction
@@ -27,7 +27,7 @@ This chart bootstraps an **Azure API Management gateway** deployment on a Kubern
 To add the chart repository:
 
 ```console
-helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
 ```
 
 ## Install the Chart
@@ -35,7 +35,7 @@ helm repo add apim-gateway https://azure.github.io/api-management-self-hosted-ga
 To install the chart with the release name `azure-api-management-gateway`:
 
 ```console
-helm install --name azure-api-management-gateway apim-gateway/azure-api-management-gateway \
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
              --set gateway.endpoint='<gateway-url>' \
              --set gateway.authKey='<gateway-key>'
 ```
@@ -80,5 +80,5 @@ Alternatively, a YAML file that specifies the values for the above parameters ca
 be provided while installing the chart. For example,
 
 ```console
-helm install apim-gateway/azure-api-management-gateway --name azure-api-management-gateway -f values.yaml
+helm install azure-apim-gateway/azure-api-management-gateway --name azure-api-management-gateway -f values.yaml
 ```
