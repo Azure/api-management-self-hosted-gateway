@@ -7,6 +7,7 @@ We are using Helm v3.
 
 ```console
 helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+helm repo update
 helm install azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway
 ```
 
@@ -28,6 +29,12 @@ To add the chart repository:
 
 ```console
 helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+```
+
+Update your Helm chart repos:
+
+```console
+helm repo update
 ```
 
 ## Install the Chart
