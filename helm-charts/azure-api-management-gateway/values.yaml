@@ -23,6 +23,10 @@ gateway:
 dapr:
   enabled: false
   appId:
+  config: tracing
+  logging:
+    useJsonOutput: true
+    level: info
 
 ingress:
   enabled: false

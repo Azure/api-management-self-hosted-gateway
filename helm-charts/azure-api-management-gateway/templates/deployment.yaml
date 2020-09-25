@@ -24,6 +24,9 @@ spec:
         {{ if .Values.dapr.appId -}}
         dapr.io/app-id: {{ .Values.dapr.appId | quote }}
         {{ end }}
+        dapr.io/config: {{ .Values.dapr.config | quote }}
+        dapr.io/log-as-json: {{ .Values.dapr.logging.useJsonOutput | quote }}
+        dapr.io/log-level: {{ .Values.dapr.logging.level | quote }}
       {{ end }}
     spec:
       containers:
