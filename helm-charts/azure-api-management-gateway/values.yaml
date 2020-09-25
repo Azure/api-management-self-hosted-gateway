@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: mcr.microsoft.com/azure-api-management/gateway
-  tag: beta
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -19,6 +19,14 @@ service:
 gateway:
   endpoint: ""
   authKey: ""
+
+dapr:
+  enabled: false
+  appId:
+  config: tracing
+  logging:
+    useJsonOutput: true
+    level: info
 
 ingress:
   enabled: false

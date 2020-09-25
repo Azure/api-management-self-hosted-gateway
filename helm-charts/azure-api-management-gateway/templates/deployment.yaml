@@ -18,6 +18,16 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      {{ if .Values.dapr.enabled -}}
+      annotations:
+        dapr.io/enabled: "true"
+        {{ if .Values.dapr.appId -}}
+        dapr.io/app-id: {{ .Values.dapr.appId | quote }}
+        {{ end }}
+        dapr.io/config: {{ .Values.dapr.config | quote }}
+        dapr.io/log-as-json: {{ .Values.dapr.logging.useJsonOutput | quote }}
+        dapr.io/log-level: {{ .Values.dapr.logging.level | quote }}
+      {{ end }}
     spec:
       containers:
         - name: {{ .Chart.Name }}

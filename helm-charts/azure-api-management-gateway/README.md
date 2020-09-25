@@ -75,6 +75,11 @@ their default values.
 | `gateway.authKey`  | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey ` | ``            |
 | `service.port`  | Port on service for other pods to talk to | `88`            |
 | `service.targetPort`  | Port on container to serve traffic | `8080`            |
+| `dapr.enabled`  | Indication wheter or not Dapr integration should be used | `false`            |
+| `dapr.appId`  | Application ID to use for Dapr integration | None            |
+| `dapr.config`  | Defines which Configuration CRD Dapr should use | `tracing`            |
+| `dapr.logging.level`  | Level of log verbosity of Dapr sidecar | `info`            |
+| `dapr.logging.useJsonOutput`  | Indication wheter or not logging should be in JSON format | `true`            |
 | `ingress.enabled`  | Indication wheter or not an ingress should be created | `false`            |
 | `ingress.annotations`  | Collection of annotations to assign to the ingress | None            |
 | `ingress.hosts`  | Host to expose ingress on |             |
