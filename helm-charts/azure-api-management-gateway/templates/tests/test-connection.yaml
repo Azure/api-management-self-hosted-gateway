@@ -16,3 +16,7 @@ spec:
       command: ['wget']
       args:  ['{{ include "azure-api-management-gateway.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
+  {{- with .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
