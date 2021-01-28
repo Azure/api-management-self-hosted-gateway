@@ -17,8 +17,8 @@ service:
   port: 88
 
 gateway:
-  endpoint: ""
-  authKey: ""
+  endpoint: 
+  authKey: 
 
 dapr:
   enabled: false
