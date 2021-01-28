@@ -6,8 +6,8 @@ replicaCount: 1
 
 image:
   repository: mcr.microsoft.com/azure-api-management/gateway
-  tag: latest
   pullPolicy: IfNotPresent
+  tag: 
 
 imagePullSecrets: []
 nameOverride: ""

@@ -1,5 +1,16 @@
 apiVersion: v2
-appVersion: "0.1"
-description: A Helm chart to deploy an Azure API Management Gateway on Kubernetes
+version: 0.3.0
+appVersion: 1.1.2
 name: azure-api-management-gateway
-version: 0.2.0
+description: A Helm chart to deploy an Azure API Management Gateway on Kubernetes
+home: https://azure.microsoft.com/en-us/services/api-management/
+sources:
+  - https://github.com/Azure/api-management-self-hosted-gateway
+maintainers:
+  - name: Vlad Vinogradsky
+    url: https://github.com/vladvino
+  - name: Miao Jiang
+    url: https://github.com/miaojiang
+  - name: Tom Kerkhove
+    url: https://github.com/tomkerkhove
+icon: https://github.com/Azure/API-Management/raw/main/media/apim-logo.png
