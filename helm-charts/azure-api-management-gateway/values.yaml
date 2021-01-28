@@ -12,10 +12,6 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-service:
-  type: ClusterIP
-  port: 88
-
 gateway:
   endpoint: ""
   authKey: ""
@@ -27,6 +23,11 @@ dapr:
   logging:
     useJsonOutput: true
     level: info
+
+service:
+  type: ClusterIP
+  port: 88
+  annotations: {}
 
 ingress:
   enabled: false
