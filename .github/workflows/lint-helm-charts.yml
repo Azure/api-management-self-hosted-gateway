@@ -12,4 +12,9 @@ jobs:
       uses: Azure/setup-helm@v1
 
     - name: Lint 'azure-api-management-gateway' Helm chart
-      run: helm lint helm-charts/azure-api-management-gateway
+      # We are using dummy gateway parameters here just to show how you can pass them as they are required
+      run: helm lint helm-charts/azure-api-management-gateway --set gateway.endpoint=abc --set gateway.authKey=XYZ
+
+    - name: Template 'azure-api-management-gateway' Helm chart
+      # We are using dummy gateway parameters here just to show how you can pass them as they are required
+      run: helm template helm-charts/azure-api-management-gateway --set gateway.endpoint=abc --set gateway.authKey=XYZ
