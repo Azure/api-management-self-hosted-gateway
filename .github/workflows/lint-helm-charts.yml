@@ -45,3 +45,6 @@ jobs:
     - name: Install Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
       run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=abc --set gateway.authKey=XYZ --wait
+
+    - name: Show Kubernetes resources
+      run: kubectl get all --namespace apim-gateway
