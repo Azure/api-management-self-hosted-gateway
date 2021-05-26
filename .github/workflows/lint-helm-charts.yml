@@ -18,3 +18,35 @@ jobs:
     - name: Template 'azure-api-management-gateway' Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
       run: helm template helm-charts/azure-api-management-gateway --set gateway.endpoint=abc --set gateway.authKey=XYZ
+
+
+  deploy-helm-3-x:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Helm install
+      uses: Azure/setup-helm@v1
+      
+    - name: Create k8s Kind Cluster
+      uses: helm/kind-action@v1.0.0
+
+    - name: Show Kubernetes version
+      run: |
+        kubectl version
+
+    - name: Show Helm version
+      run: |
+        helm version
+
+    - name: Create keda namespace
+      run: kubectl create ns apim-gateway
+
+    - name: Template Helm chart
+      # We are using dummy gateway parameters here just to show how you can pass them as they are required
+      run: helm template azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=abc --set gateway.authKey=XYZ
+
+    - name: Install Helm chart
+      # We are using dummy gateway parameters here just to show how you can pass them as they are required
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=abc --set gateway.authKey=XYZ --wait
