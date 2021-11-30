@@ -17,6 +17,7 @@ jobs:
 
   deploy-helm-3-x:
     runs-on: ubuntu-latest
+    needs: lint-helm-3-x
     strategy:
       fail-fast: false
       matrix:
