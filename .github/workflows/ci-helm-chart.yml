@@ -53,6 +53,10 @@ jobs:
       run: |
         kubectl version
 
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
     - name: Show Helm version
       run: |
         helm version
