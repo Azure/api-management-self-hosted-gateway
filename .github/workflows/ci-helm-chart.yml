@@ -70,3 +70,4 @@ jobs:
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
+      if: always()
