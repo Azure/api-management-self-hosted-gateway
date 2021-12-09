@@ -31,7 +31,7 @@ body:
       3.
   validations:
     required: true
-- type: textarea
+- type: input
   id: version
   attributes:
     label: Self-hosted Gateway Version
