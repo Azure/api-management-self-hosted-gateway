@@ -48,15 +48,16 @@ body:
     description: "What version of the self-hosted gateway are you running?"
   validations:
     required: true
-- type: checkboxes
+- type: dropdown
   id: hosting-flavor
   attributes:
-    label: Deployment Mechanism
+    label: Deployment
     description: "How was the self-hosted gateway deployed?"
     options:
-      - label: Azure Arc
-      - label: Self-Managed (YAML/Helm)
-      - label: Other
+    - Azure Arc
+    - Self-Managed (YAML/Helm)
+    - Docker (Compose)
+    - Other
   validations:
     required: true
 - type: dropdown
