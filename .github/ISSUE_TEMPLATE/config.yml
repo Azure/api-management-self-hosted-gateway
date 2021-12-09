@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Need support
+    url: https://portal.azure.com/#blade/Microsoft_Azure_Support/HelpAndSupportBlade/overview
+    about: I'd like to have support for our (production) self-hosted gateway
+  - name: Ask a question
+    url: https://github.com/azure/api-management-self-hosted-gateway/discussions/new
+    about: Ask a question
