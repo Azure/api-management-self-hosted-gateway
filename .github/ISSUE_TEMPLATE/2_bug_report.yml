@@ -31,13 +31,6 @@ body:
       3.
   validations:
     required: true
-- type: input
-  id: version
-  attributes:
-    label: Self-hosted Gateway Version
-    description: "What version of the self-hosted gateway are you running?"
-  validations:
-    required: true
 - type: textarea
   attributes:
     label: Logs from self-hosted gateway
@@ -48,6 +41,38 @@ body:
       ```
   validations:
     required: true
+- type: input
+  id: version
+  attributes:
+    label: Self-hosted Gateway Version
+    description: "What version of the self-hosted gateway are you running?"
+  validations:
+    required: true
+- type: checkboxes
+  id: hosting-flavor
+  attributes:
+    label: Deployment Mechanism
+    description: "How was the self-hosted gateway deployed?"
+    options:
+      - label: Azure Arc
+      - label: Self-Managed (YAML/Helm)
+      - label: Other
+  validations:
+    required: true
+- type: dropdown
+  attributes:
+    label: Platform
+    description: Where is your cluster running?
+    options:
+    - Any
+    - Alibaba Cloud
+    - Amazon Web Services
+    - Google Cloud
+    - Microsoft Azure
+    - Red Hat OpenShift
+    - Other
+  validations:
+    required: false
 - type: dropdown
   attributes:
     label: Kubernetes Version
@@ -61,20 +86,6 @@ body:
     - "1.17"
     - "< 1.17"
     - "Other"
-  validations:
-    required: false
-- type: dropdown
-  attributes:
-    label: Platform
-    description: Where is your cluster running?
-    options:
-    - Any
-    - Alibaba Cloud
-    - Amazon Web Services
-    - Google Cloud
-    - Microsoft Azure
-    - Red Hat OpenShift
-    - Other
   validations:
     required: false
 - type: textarea
