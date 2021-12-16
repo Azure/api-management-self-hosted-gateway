@@ -27,7 +27,9 @@ dapr:
 
 service:
   type: ClusterIP
-  port: 88
+  ports:
+    http: 8080
+    https: 8081
   annotations: {}
 
 ingress:
