@@ -1,0 +1,6 @@
+# Configuration for our Artifact Hub repository
+# See https://github.com/artifacthub/hub/blob/master/docs/metadata/artifacthub-repo.yml
+repositoryID: ffe0deb5-6d95-4a71-b83a-6cfed760c53e
+owners:
+  - name: Azure API Management
+    email: apimgmt@microsoft.com
