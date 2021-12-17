@@ -73,8 +73,10 @@ their default values.
 | `resources`  | Pod resource requests & limits |    `{}`    |
 | `gateway.endpoint`  | Endpoint in Azure API Management to which every self-hosted agent has to connect | ``            |
 | `gateway.authKey`  | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey ` | ``            |
-| `service.port`  | Port on service for other pods to talk to | `88`            |
-| `service.targetPort`  | Port on container to serve traffic | `8080`            |
+| `service.type`  | Type of Kubernetes service to use to expose to serve traffic | `ClusterIP`            |
+| `service.annotations`  | Annotations to add to the Kubernetes service | None            |
+| `service.ports.http`  | Port for HTTP traffic on service for other pods to talk to | `8080`            |
+| `service.ports.https`  | Port for HTTPs traffic on service for other pods to talk to | `8081`            |
 | `dapr.enabled`  | Indication wheter or not Dapr integration should be used | `false`            |
 | `dapr.appId`  | Application ID to use for Dapr integration | None            |
 | `dapr.config`  | Defines which Configuration CRD Dapr should use | `tracing`            |
