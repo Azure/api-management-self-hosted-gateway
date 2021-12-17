@@ -21,6 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        enableHighAvailability: [false, true]
+        kubernetesVersion: [v1.22, v1.21, v1.20, v1.19, v1.18, v1.17]
         include:
           # Images are defined on every Kind release
           # See https://github.com/kubernetes-sigs/kind/releases
@@ -36,7 +38,7 @@ jobs:
           kindImage: kindest/node:v1.18.19@sha256:7af1492e19b3192a79f606e43c35fb741e520d195f96399284515f077b3b622c
         - kubernetesVersion: v1.17
           kindImage: kindest/node:v1.17.17@sha256:66f1d0d91a88b8a001811e2f1054af60eef3b669a9a74f9b6db871f2f1eeed00
-    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }}
+    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -66,11 +68,11 @@ jobs:
 
     - name: Template Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
-      run: helm template azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=${{ secrets.GATEWAY_URL }} --set gateway.authKey=${{ secrets.GATEWAY_KEY }}
+      run: helm template azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=${{ secrets.GATEWAY_URL }} --set gateway.authKey=${{ secrets.GATEWAY_KEY }} --set gateway.authKey=XYZ --set highAvailability.enabled=${{ matrix.enableHighAvailability }}
 
     - name: Install Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=${{ secrets.GATEWAY_URL }} --set gateway.authKey=${{ secrets.GATEWAY_KEY }} --wait
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.endpoint=${{ secrets.GATEWAY_URL }} --set gateway.authKey=${{ secrets.GATEWAY_KEY }} --set gateway.authKey=XYZ --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --wait
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway

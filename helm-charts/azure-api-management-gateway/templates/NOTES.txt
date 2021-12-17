@@ -1,4 +1,12 @@
-1. Get the application URL by running these commands:
+The self-hosted gateway of Azure API Management is deployed!
+
+{{- if .Values.highAvailability.enabled }}
+It is has been deployed with high availablity inside the cluster.
+{{- else}}
+It is has been deployed without high availablity inside the cluster.
+{{- end }}
+
+You can find the URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}
   {{- range .paths }}
@@ -19,3 +27,6 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl port-forward $POD_NAME 8080:80
 {{- end }}
+
+
+
