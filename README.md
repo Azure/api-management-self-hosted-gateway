@@ -1,4 +1,4 @@
-# Azure API Management Self-Hosted Gateway samples and stuff
+# Azure API Management Self-Hosted Gateway
 
 ## What is Azure API Management Self-Hosted Gateway?
 
