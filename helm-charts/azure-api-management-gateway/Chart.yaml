@@ -1,5 +1,5 @@
 apiVersion: v2
-version: 0.3.0
+version: 1.0.0
 appVersion: 1.2.5
 name: azure-api-management-gateway
 description: A Helm chart to deploy the self-hosted gateway of Azure API Management on Kubernetes
