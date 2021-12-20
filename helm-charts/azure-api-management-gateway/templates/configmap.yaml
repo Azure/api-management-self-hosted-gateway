@@ -9,3 +9,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   config.service.endpoint: {{ .Values.gateway.endpoint | quote }}
+  {{ if .Values.observability.opentelemetry.enabled -}}
+  config.observability.opentelemetry.enabled: "true"
+  config.observability.opentelemetry.collector.uri: {{ .Values.observability.opentelemetry.collector.uri | quote }}
+  {{ end }}

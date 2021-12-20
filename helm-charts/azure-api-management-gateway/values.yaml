@@ -17,6 +17,12 @@ gateway:
   endpoint: 
   authKey: 
 
+observability:
+  opentelemetry:
+    enabled: false
+    collector:
+      uri: 
+
 dapr:
   enabled: false
   appId:
