@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  config.service.endpoint: {{ .Values.gateway.endpoint | quote }}
+  config.service.endpoint: {{ .Values.gateway.configuration.uri | quote }}
   config.observability.opentelemetry.enabled: {{ .Values.observability.opentelemetry.enabled | quote }}
   {{ if .Values.observability.opentelemetry.enabled -}}
   config.observability.opentelemetry.collector.uri: {{ .Values.observability.opentelemetry.collector.uri | quote }}

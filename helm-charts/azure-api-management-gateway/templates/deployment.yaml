@@ -21,8 +21,8 @@ spec:
       {{ if .Values.dapr.enabled -}}
       annotations:
         dapr.io/enabled: "true"
-        {{ if .Values.dapr.appId -}}
-        dapr.io/app-id: {{ .Values.dapr.appId | quote }}
+        {{ if .Values.dapr.app.id -}}
+        dapr.io/app-id: {{ .Values.dapr.app.id | quote }}
         {{ end }}
         dapr.io/config: {{ .Values.dapr.config | quote }}
         dapr.io/log-as-json: {{ .Values.dapr.logging.useJsonOutput | quote }}

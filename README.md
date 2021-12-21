@@ -23,8 +23,8 @@ helm repo update
 To install the chart with the release name `azure-api-management-gateway`:
 ```
 helm install azure-api-management-gateway  \
-             --set gateway.endpoint='<azure-api-management-url>' \
-             --set gateway.authKey='<azure-api-management-gateway-key>' \
+             --set gateway.configuration.uri='<azure-api-management-url>' \
+             --set gateway.auth.key='<azure-api-management-gateway-key>' \
              azure-apim-gateway/azure-api-management-gateway
 ```
 
