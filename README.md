@@ -1,4 +1,6 @@
-# Azure API Management Self-Hosted Gateway samples and stuff
+# Azure API Management Self-Hosted Gateway
+
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/azure-api-management)](https://artifacthub.io/packages/search?repo=azure-api-management)
 
 ## What is Azure API Management Self-Hosted Gateway?
 
@@ -20,9 +22,10 @@ helm repo update
 
 To install the chart with the release name `azure-api-management-gateway`:
 ```
-helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
-             --set gateway.endpoint='<azure-api-management-url>' \
-             --set gateway.authKey='<azure-api-management-gateway-key>'
+helm install azure-api-management-gateway  \
+             --set gateway.configuration.uri='<azure-api-management-url>' \
+             --set gateway.auth.key='<azure-api-management-gateway-key>' \
+             azure-apim-gateway/azure-api-management-gateway
 ```
 
 This will deploy the Azure API Management Self-Hosted gateway on your Kubernetes cluster, but we provide options to configure it according to your needs.
