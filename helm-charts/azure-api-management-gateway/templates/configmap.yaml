@@ -8,4 +8,4 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  config.service.endpoint: {{ .Values.gateway.endpoint | quote }}
+  config.service.endpoint: {{ .Values.gateway.configuration.uri | quote }}

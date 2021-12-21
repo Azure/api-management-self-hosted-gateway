@@ -14,12 +14,15 @@ nameOverride: ""
 fullnameOverride: ""
 
 gateway:
-  endpoint: 
-  authKey: 
+  configuration:
+    uri: 
+  auth:
+    key: 
 
 dapr:
   enabled: false
-  appId:
+  app:
+    id:
   config: tracing
   logging:
     useJsonOutput: true
