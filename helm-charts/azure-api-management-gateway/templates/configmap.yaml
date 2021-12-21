@@ -3,9 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "azure-api-management-gateway.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
-    helm.sh/chart: {{ include "azure-api-management-gateway.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 data:
   config.service.endpoint: {{ .Values.gateway.configuration.uri | quote }}
+  telemetry.metrics.cloud	: {{ .Values.observability.azureMonitor.metrics.enabled | quote }}
