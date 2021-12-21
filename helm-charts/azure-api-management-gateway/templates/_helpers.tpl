@@ -30,3 +30,28 @@ Create chart name and version as used by the chart label.
 {{- define "azure-api-management-gateway.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+    Common labels
+*/}}
+{{- define "azure-api-management-gateway.labels" -}}
+helm.sh/chart: {{ include "azure-api-management-gateway.chart" . }}
+{{ include "azure-api-management-gateway.selectorLabels" . }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+{{/*
+    Selector labels
+*/}}
+{{- define "azure-api-management-gateway.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "azure-api-management-gateway.fullname" . }}
+app.kubernetes.io/component: self-hosted-gateway
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+    Create a name for the pod disruption budget
+*/}}
+{{- define "azure-api-management-gateway.disruptionname" -}}
+{{ include "azure-api-management-gateway.fullname" . | trunc 52 | trimSuffix "-" }}-disruption
+{{- end }}

@@ -3,22 +3,17 @@ kind: Deployment
 metadata:
   name: {{ include "azure-api-management-gateway.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
-    helm.sh/chart: {{ include "azure-api-management-gateway.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "azure-api-management-gateway.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-      {{ if .Values.dapr.enabled -}}
+        {{- include "azure-api-management-gateway.selectorLabels" . | nindent 8 }}
+      {{- if .Values.dapr.enabled -}}
       annotations:
         dapr.io/enabled: "true"
         {{ if .Values.dapr.app.id -}}
@@ -27,7 +22,7 @@ spec:
         dapr.io/config: {{ .Values.dapr.config | quote }}
         dapr.io/log-as-json: {{ .Values.dapr.logging.useJsonOutput | quote }}
         dapr.io/log-level: {{ .Values.dapr.logging.level | quote }}
-      {{ end }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -53,6 +48,17 @@ spec:
               name: {{ include "azure-api-management-gateway.fullname" . }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+{{- if .Values.highAvailability.enabled }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.Version }}
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: {{ .Values.highAvailability.podTopologySpread.whenUnsatisfiable }}
+        labelSelector:
+          matchLabels:
+            {{- include "azure-api-management-gateway.selectorLabels" . | nindent 12 }}
+{{- end }}
+{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -60,6 +66,23 @@ spec:
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
+{{- if semverCompare "<1.19-0" .Capabilities.KubeVersion.Version }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - {{ include "azure-api-management-gateway.name" . }}
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - {{ .Release.Name }}
+              topologyKey: topology.kubernetes.io/zone
+{{- end -}}
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:

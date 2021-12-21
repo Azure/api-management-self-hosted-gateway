@@ -3,10 +3,7 @@ kind: Service
 metadata:
   name: {{ include "azure-api-management-gateway.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
-    helm.sh/chart: {{ include "azure-api-management-gateway.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -23,5 +20,4 @@ spec:
       protocol: TCP
       name: https
   selector:
-    app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "azure-api-management-gateway.selectorLabels" . | nindent 4 }}
