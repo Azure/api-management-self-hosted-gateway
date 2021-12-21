@@ -24,6 +24,10 @@ observability:
     enabled: false
     collector:
       uri: 
+    histogram:
+      # Specify custom bucket sizes using ',' seperator.
+      # Example: '10,20'
+      buckets: 
 
 dapr:
   enabled: false

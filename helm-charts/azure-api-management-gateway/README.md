@@ -75,6 +75,7 @@ their default values.
 | `gateway.auth.key`  | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey ` | ``            |
 | `observability.opentelemetry.enabled`  | Indication whether or not OpenTelemetry observability should be provided for the gateway. Learn more in [our observability documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-observability#opentelemetry).| `false`            |
 | `observability.opentelemetry.collector.uri`  | Uri of the OpenTelemetry Collector to push metrics to. Learn more in [our observability documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-observability#opentelemetry). | N/A |
+| `observability.opentelemetry.histogram.buckets`  | Define custom bucket sizes for all histograms in OpenTelemetry metrics. Format must be `,` separated. | N/A |
 | `service.type`  | Type of Kubernetes service to use to expose to serve traffic | `ClusterIP`            |
 | `service.annotations`  | Annotations to add to the Kubernetes service | None            |
 | `service.ports.http`  | Port for HTTP traffic on service for other pods to talk to | `8080`            |
