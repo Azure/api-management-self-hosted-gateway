@@ -73,6 +73,7 @@ their default values.
 | `resources`  | Pod resource requests & limits |    `{}`    |
 | `gateway.configuration.uri`  | Endpoint in Azure API Management to which every self-hosted agent has to connect | `` |
 | `gateway.auth.key`  | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey ` | ``            |
+| `observability.azureMonitor.metrics.enabled`  | Indication whether or not metrics should be sent to Azure Monitor. Learn more in [our documentation](https://docs.microsoft.com/en-us/azure/api-management/how-to-configure-cloud-metrics-logs#metrics). | `true`            |
 | `service.type`  | Type of Kubernetes service to use to expose to serve traffic | `ClusterIP`            |
 | `service.annotations`  | Annotations to add to the Kubernetes service | None            |
 | `service.ports.http`  | Port for HTTP traffic on service for other pods to talk to | `8080`            |

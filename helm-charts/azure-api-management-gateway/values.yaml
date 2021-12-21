@@ -19,6 +19,11 @@ gateway:
   auth:
     key: 
 
+observability:
+  azureMonitor:
+    metrics:
+      enabled: true
+
 dapr:
   enabled: false
   app:
