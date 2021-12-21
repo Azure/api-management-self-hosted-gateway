@@ -61,6 +61,13 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+highAvailability:
+  enabled: false
+  disruption:
+    maximumUnavailable: 25%
+  podTopologySpread:
+    whenUnsatisfiable: ScheduleAnyway
+
 nodeSelector: {}
 
 tolerations: []
