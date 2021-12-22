@@ -9,8 +9,8 @@ We are using Helm v3.
 helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
 helm repo update
 helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
-             --set gateway.endpoint='<gateway-url>' \
-             --set gateway.authKey='<gateway-key>'
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.key='<gateway-key>'
 ```
 
 ## Introduction
