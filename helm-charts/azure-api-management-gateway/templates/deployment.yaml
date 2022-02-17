@@ -47,13 +47,9 @@ spec:
             - name: https
               containerPort: 8081
           readinessProbe:
-            httpGet:
-              path: /status-0123456789abcdef
-              port: http
+            {{- toYaml .Values.probes.readiness | nindent 12 }}
           livenessProbe:
-            httpGet:
-              path: /status-0123456789abcdef
-              port: http
+            {{- toYaml .Values.probes.liveness | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.highAvailability.enabled }}
