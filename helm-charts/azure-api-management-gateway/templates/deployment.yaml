@@ -32,11 +32,6 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: 8080
-            - name: https
-              containerPort: 8081
           env:
           - name: config.service.auth
             valueFrom:
@@ -46,6 +41,19 @@ spec:
           envFrom:
           - configMapRef:
               name: {{ include "azure-api-management-gateway.fullname" . }}
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8081
+          readinessProbe:
+            httpGet:
+              path: /status-0123456789abcdef
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /status-0123456789abcdef
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.highAvailability.enabled }}
