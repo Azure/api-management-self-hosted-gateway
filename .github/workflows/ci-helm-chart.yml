@@ -77,3 +77,7 @@ jobs:
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
       if: always()
+
+    - name: Show Logs for Self-Hosted Gateway
+      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway
+      if: always()
