@@ -6,10 +6,11 @@ metadata:
     {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 data:
   config.service.endpoint: {{ .Values.gateway.configuration.uri | quote }}
-  config.observability.opentelemetry.enabled: {{ .Values.observability.opentelemetry.enabled | quote }}
+  telemetry.metrics.cloud: {{ .Values.observability.azureMonitor.metrics.enabled | quote }}
+  observability.opentelemetry.enabled: {{ .Values.observability.opentelemetry.enabled | quote }}
 {{- if eq .Values.observability.opentelemetry.enabled true }}
-  config.observability.opentelemetry.collector.uri: {{ .Values.observability.opentelemetry.collector.uri | quote }}
+  observability.opentelemetry.collector.uri: {{ .Values.observability.opentelemetry.collector.uri | quote }}
   {{ if .Values.observability.opentelemetry.histogram.buckets -}}
-  config.observability.opentelemetry.histogram.buckets: {{ .Values.observability.opentelemetry.histogram.buckets | quote }}
+  observability.opentelemetry.histogram.buckets: {{ .Values.observability.opentelemetry.histogram.buckets | quote }}
   {{ end }}
 {{- end }}

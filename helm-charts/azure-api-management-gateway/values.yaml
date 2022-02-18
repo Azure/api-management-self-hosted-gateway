@@ -20,6 +20,9 @@ gateway:
     key: 
 
 observability:
+  azureMonitor:
+    metrics:
+      enabled: true
   opentelemetry:
     enabled: false
     collector:
@@ -58,6 +61,16 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+probes:
+  readiness:
+    httpGet:
+      path: /status-0123456789abcdef
+      port: http
+  liveness:
+    httpGet:
+      path: /status-0123456789abcdef
+      port: http
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
