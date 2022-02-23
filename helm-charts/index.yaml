@@ -3,10 +3,10 @@ entries:
   azure-api-management-gateway:
   - apiVersion: v2
     appVersion: 2.0.0-preview-6
-    created: "2022-02-23T22:24:40.9603706+01:00"
+    created: "2022-02-23T22:29:42.9606938+01:00"
     description: A Helm chart to deploy the self-hosted gateway of Azure API Management
       on Kubernetes
-    digest: f33fa70cdfcaf75d441ad88434c29deb344bb03e270b9afe38bec82d0f143230
+    digest: 3d3be396e7ca94ede85eca3b8c62770f109eb72f6faeb142f96360160f8019da
     home: https://azure.microsoft.com/en-us/services/api-management/
     icon: https://github.com/Azure/API-Management/raw/main/media/apim-logo.png
     keywords:
@@ -17,6 +17,8 @@ entries:
     - Cloud
     - Multi-Cloud
     - Hybrid
+    - Kubernetes
+    - Cloud-Native
     kubeVersion: '>=v1.17.0-0'
     maintainers:
     - name: Vlad Vinogradsky
@@ -31,7 +33,7 @@ entries:
     version: 1.0.0-rc.3
   - apiVersion: v2
     appVersion: 1.2.5
-    created: "2022-02-23T22:24:40.9593641+01:00"
+    created: "2022-02-23T22:29:42.9596961+01:00"
     description: A Helm chart to deploy the self-hosted gateway of Azure API Management
       on Kubernetes
     digest: c374af4724f6bf4c89b3c99fcbf765d86f7771139f15c8e142221e8a29a33fce
@@ -59,7 +61,7 @@ entries:
     version: 1.0.0-rc.2
   - apiVersion: v2
     appVersion: 1.2.5
-    created: "2022-02-23T22:24:40.9729898+01:00"
+    created: "2022-02-23T22:29:42.9616945+01:00"
     description: A Helm chart to deploy the self-hosted gateway of Azure API Management
       on Kubernetes
     digest: ac05c73f2b2959f33ccaa1676ee7ff80c4da93a480f437f11baeaa4b88d9c337
@@ -87,7 +89,7 @@ entries:
     version: 1.0.0-rc
   - apiVersion: v2
     appVersion: 1.1.2
-    created: "2022-02-23T22:24:40.9446438+01:00"
+    created: "2022-02-23T22:29:42.9586926+01:00"
     description: A Helm chart to deploy an Azure API Management Gateway on Kubernetes
     digest: ee786a90c7b2dadc2556fe951ca46ceda9238b0bda2ccd7495b4d738a97cad7a
     home: https://azure.microsoft.com/en-us/services/api-management/
@@ -107,7 +109,7 @@ entries:
     version: 0.3.0
   - apiVersion: v2
     appVersion: "0.1"
-    created: "2022-02-23T22:24:40.939125+01:00"
+    created: "2022-02-23T22:29:42.9586926+01:00"
     description: A Helm chart to deploy an Azure API Management Gateway on Kubernetes
     digest: 87e167df5b0b18bd5899a988dcc45d986a9835d8c73e78540e197ea9baeeb870
     name: azure-api-management-gateway
@@ -116,7 +118,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: "0.1"
-    created: "2022-02-23T22:24:40.9327478+01:00"
+    created: "2022-02-23T22:29:42.9576955+01:00"
     description: A Helm chart to deploy an Azure API Management Gateway on Kubernetes
     digest: c667c0b6ac71ae7f094af4d7962b63d8b7b1c262c514532c6af8b8577a51cc8b
     name: azure-api-management-gateway
@@ -125,11 +127,11 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: "0.1"
-    created: "2022-02-23T22:24:40.927914+01:00"
+    created: "2022-02-23T22:29:42.9576955+01:00"
     description: A Helm chart to deploy an Azure API Management Gateway on Kubernetes
     digest: ad6a388e2e7ac41862465dead7c3abd8f0d8766eb1f9acb56d539c9e668f36ee
     name: azure-api-management-gateway
     urls:
     - https://azure.github.io/api-management-self-hosted-gateway/helm-charts/azure-api-management-gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2022-02-23T22:24:40.9209751+01:00"
+generated: "2022-02-23T22:29:42.9566948+01:00"
