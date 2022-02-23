@@ -13,7 +13,7 @@ jobs:
 
     - name: Lint 'azure-api-management-gateway' Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
-      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri=${{ secrets.GATEWAY_URL }} --set gateway.auth.key=${{ secrets.GATEWAY_KEY }}
+      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}"
 
   deploy-helm-3-x:
     runs-on: ubuntu-latest
@@ -69,10 +69,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm template azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ secrets.GATEWAY_URL }} --set gateway.auth.key=${{ secrets.GATEWAY_KEY }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} 
+      run: helm template azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} 
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ secrets.GATEWAY_URL }} --set gateway.auth.key=${{ secrets.GATEWAY_KEY }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }}  --wait
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }}  --wait
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
