@@ -65,7 +65,7 @@ jobs:
       run: |
         helm version
 
-    - name: Create keda namespace
+    - name: Create Kubernetes namespace
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
