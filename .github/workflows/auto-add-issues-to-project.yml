@@ -33,7 +33,7 @@ jobs:
           echo 'PROJECT_ID='$(jq '.data.organization.projectNext.id' project_data.json) >> $GITHUB_ENV
       - name: Add issue to project
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PROJECT_AUTOMATION_AUTH }}
+          GITHUB_TOKEN: ${{ secrets.GH_PROJECT_AUTH }}
           ISSUE_ID: ${{ github.event.issue.node_id }}
         run: |
           item_id="$( gh api graphql -f query='
