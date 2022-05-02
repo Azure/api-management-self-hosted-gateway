@@ -33,6 +33,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          - name: runtime.deployment.mechanism
+            value: "Helm"
+          - name: runtime.deployment.orchestrator.type
+            value: "Kubernetes"
           - name: config.service.auth
             valueFrom:
               secretKeyRef:
