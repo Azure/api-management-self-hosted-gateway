@@ -35,6 +35,10 @@ To learn more, we recommend inspecting the Helm chart:
 helm inspect all azure-apim-gateway/azure-api-management-gateway
 ```
 
+## License
+
+You can find the license of this repo [here](LICENSE), but our gateway itself has a different license which is available [here](LICENSE.gateway)
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
