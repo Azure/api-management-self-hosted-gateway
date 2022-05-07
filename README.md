@@ -37,7 +37,7 @@ helm inspect all azure-apim-gateway/azure-api-management-gateway
 
 ## License
 
-You can find the license of this repo [here](LICENSE), but our gateway itself has a different license which is available [here](gateway-license.md).
+Azure API Management Self-Hosted Gateway license is available [here](gateway-license.md). This repo is licensed under a different license that can be viewed [here](LICENSE).
 
 ## Contributing
 
