@@ -29,7 +29,7 @@ jobs:
         include:
           # Images are defined on every Kind release
           # See https://github.com/kubernetes-sigs/kind/releases
-        - kubernetesVersion: v1.23
+        - kubernetesVersion: v1.24
           kindImage: kindest/node:v1.24.0@sha256:406fd86d48eaf4c04c7280cd1d2ca1d61e7d0d61ddef0125cb097bc7b82ed6a1
         - kubernetesVersion: v1.23
           kindImage: kindest/node:v1.23.6@sha256:1af0f1bee4c3c0fe9b07de5e5d3fafeb2eec7b4e1b268ae89fcab96ec67e8355
