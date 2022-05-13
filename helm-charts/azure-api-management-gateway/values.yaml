@@ -22,7 +22,7 @@ gateway:
 
 secret:
   createSecret: true
-  secretName: ""
+  existingSecretName: ""
 
 observability:
   azureMonitor:

@@ -46,7 +46,7 @@ spec:
                 {{ if .Values.secret.createSecret -}}
                 name: {{ include "azure-api-management-gateway.fullname" . }}
                 {{ else }}
-                name: {{ .Values.secret.secretName }}
+                name: {{ .Values.secret.existingSecretName }}
                 {{ end }}
                 key: gateway-key
           envFrom:
