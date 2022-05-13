@@ -17,7 +17,14 @@ gateway:
   configuration:
     uri: 
   auth:
+    # When an existing secret is configured, the value specified here will not be used
     key: 
+
+secret:
+  useExisting:
+    enabled: false
+    name: 
+
 
 observability:
   azureMonitor:
