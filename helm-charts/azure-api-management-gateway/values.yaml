@@ -21,9 +21,8 @@ gateway:
     key: 
 
 secret:
-  useExisting:
-    enabled: false
-    name: 
+  createSecret: true
+  secretName: ""
 
 observability:
   azureMonitor:
