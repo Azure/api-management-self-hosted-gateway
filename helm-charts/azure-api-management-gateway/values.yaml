@@ -25,7 +25,6 @@ secret:
     enabled: false
     name: 
 
-
 observability:
   azureMonitor:
     metrics:
