@@ -59,6 +59,14 @@ spec:
             {{- toYaml .Values.probes.liveness | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 {{- if .Values.highAvailability.enabled }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.Version }}
       topologySpreadConstraints:
