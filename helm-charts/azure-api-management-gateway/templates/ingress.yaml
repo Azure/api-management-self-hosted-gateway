@@ -1,8 +1,10 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "azure-api-management-gateway.fullname" . -}}
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.Version }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.Version }}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.Version }}
 apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
+{{- else }}
 apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
