@@ -1,4 +1,4 @@
-{{- if  and (.Values.ingress.enabled) (semverCompare ">=1.19-0" .Capabilities.KubeVersion.Version) -}}
+{{- if  and (.Values.ingress.enabled) (.Capabilities.APIVersions.Has "networking.k8s.io/v1") -}}
 {{- $fullName := include "azure-api-management-gateway.fullname" . -}}
 {{- $httpPort := .Values.service.ports.http -}}
 apiVersion: networking.k8s.io/v1
