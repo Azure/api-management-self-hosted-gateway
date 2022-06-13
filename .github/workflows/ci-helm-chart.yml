@@ -2,7 +2,7 @@ name: Helm Chart CI
 on: 
   workflow_dispatch:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, ready_for_review]
 
 jobs:
   lint-helm-3-x:
