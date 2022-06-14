@@ -74,7 +74,7 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm template azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
 
     - name: Install Helm chart
       run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait

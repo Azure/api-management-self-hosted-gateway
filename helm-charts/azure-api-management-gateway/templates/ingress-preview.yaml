@@ -33,7 +33,6 @@ spec:
         paths:
         {{- range .paths }}
           - path: {{ . }}
-            pathType: Prefix
             backend:
               serviceName: {{ $fullName }}
               servicePort: http
