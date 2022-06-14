@@ -1,4 +1,5 @@
-{{- if  and (.Values.ingress.enabled) (.Capabilities.APIVersions.Has "networking.k8s.io/v1") -}}
+{{- $doesSupportStableIngress := .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
+{{- if  and (.Values.ingress.enabled) ($doesSupportStableIngress) -}}
 {{- $fullName := include "azure-api-management-gateway.fullname" . -}}
 {{- $httpPort := .Values.service.ports.http -}}
 apiVersion: networking.k8s.io/v1
