@@ -25,6 +25,23 @@ secret:
   existingSecretName: ""
 
 observability:
+  logs:
+    std:
+      format: text
+      level: info
+    local:
+      type: auto
+      localsyslog:
+        endpoint:
+        facility:
+      rfc5424:
+        endpoint:
+        facility:
+      journal:
+        endpoint:
+      json:
+        endpoint: 127.0.0.1:8888
+
   azureMonitor:
     metrics:
       enabled: true
