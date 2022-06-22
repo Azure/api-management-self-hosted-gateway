@@ -1,3 +1,4 @@
+{{- $configurationUri := .Values.gateway.configuration.uri | required ".Values.gateway.configuration.uri is required." -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 data:
-  config.service.endpoint: {{ .Values.gateway.configuration.uri | quote }}
+  config.service.endpoint: {{ $configurationUri | quote }}
   telemetry.metrics.cloud: {{ .Values.observability.azureMonitor.metrics.enabled | quote }}
   telemetry.logs.std: {{ .Values.observability.logs.std.format | quote }}
   telemetry.logs.std.level: {{ .Values.observability.logs.std.level | quote }}
