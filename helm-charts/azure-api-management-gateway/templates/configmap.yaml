@@ -28,6 +28,17 @@ data:
 {{- if .Values.observability.logs.local.json.endpoint }}
   telemetry.logs.local.json.endpoint: {{ .Values.observability.logs.local.json.endpoint | quote }}
 {{- end }}
+{{- if eq .Values.observability.statsD.enabled true }}
+{{- $statsdEndpoint := .Values.observability.statsD.endpoint | required ".Values.observability.statsD.endpoint is required when StatsD is enabled." }}
+{{- $statsdSampling := .Values.observability.statsD.sampling | required ".Values.observability.statsD.sampling is required when StatsD is enabled." }}
+{{- $statsdTagFormat := .Values.observability.statsD.tagFormat | required ".Values.observability.statsD.tagFormat is required when StatsD is enabled." }}
+  telemetry.metrics.local: "statsd"
+  telemetry.metrics.local.statsd.endpoint: {{ $statsdEndpoint | quote }}
+  telemetry.metrics.local.statsd.sampling: {{ $statsdSampling | quote }}
+  telemetry.metrics.local.statsd.tag-format: {{ $statsdTagFormat | quote }}
+{{- else }}
+  telemetry.metrics.local: "none"
+{{- end }}
   observability.opentelemetry.enabled: {{ .Values.observability.opentelemetry.enabled | quote }}
 {{- if eq .Values.observability.opentelemetry.enabled true }}
   observability.opentelemetry.collector.uri: {{ .Values.observability.opentelemetry.collector.uri | quote }}

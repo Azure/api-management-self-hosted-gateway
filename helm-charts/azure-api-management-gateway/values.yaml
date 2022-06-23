@@ -53,6 +53,11 @@ observability:
       # Specify custom bucket sizes using ',' seperator.
       # Example: '10,20'
       buckets: 
+  statsD:
+    enabled: false
+    endpoint: 
+    sampling: 1
+    tagFormat: dogStatsD
 
 dapr:
   enabled: false
