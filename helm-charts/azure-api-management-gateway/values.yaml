@@ -29,6 +29,7 @@ observability:
     std:
       format: text
       level: info
+      useColor: true
     local:
       type: auto
       localsyslog:
