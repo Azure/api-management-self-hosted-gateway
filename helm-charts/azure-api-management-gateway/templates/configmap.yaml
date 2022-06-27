@@ -48,3 +48,9 @@ data:
   observability.opentelemetry.histogram.buckets: {{ .Values.observability.opentelemetry.histogram.buckets | quote }}
   {{ end }}
 {{- end }}
+{{- if .Values.security.tls.server.ciphers.allowedSuites }}
+  net.server.tls.ciphers.allowed-suites: {{ .Values.security.tls.server.ciphers.allowedSuites | quote }}
+{{- end }}
+{{- if .Values.security.tls.client.ciphers.allowedSuites }}
+  net.client.tls.ciphers.allowed-suites: {{ .Values.security.tls.client.ciphers.allowedSuites | quote }}
+{{- end }}

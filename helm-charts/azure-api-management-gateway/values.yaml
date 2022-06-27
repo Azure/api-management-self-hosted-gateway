@@ -60,6 +60,15 @@ observability:
     sampling: 1
     tagFormat: dogStatsD
 
+security:
+  tls:
+    server:
+      ciphers:
+        allowedSuites: 
+    client:
+      ciphers:
+        allowedSuites: 
+
 dapr:
   enabled: false
   app:
