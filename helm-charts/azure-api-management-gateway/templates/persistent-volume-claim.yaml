@@ -1,0 +1,17 @@
+{{- if and .Values.backup.enabled .Values.backup.createPVC -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "azure-api-management-gateway.fullname" . }}
+  labels:
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
+spec:
+  {{- if ne .Values.backup.PVC.storageClassName nil }}
+  storageClassName: {{ .Values.backup.PVC.storageClassName | quote }}
+  {{- end }}
+  accessModes:
+    - {{ .Values.backup.PVC.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.backup.PVC.size }}
+{{- end }}
