@@ -1,0 +1,17 @@
+{{- if and .Values.gateway.configuration.backup.enabled .Values.gateway.configuration.backup.persistentVolumeClaim.create -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "azure-api-management-gateway.fullname" . }}
+  labels:
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
+spec:
+  {{- if ne .Values.gateway.configuration.backup.persistentVolumeClaim.storageClassName nil }}
+  storageClassName: {{ .Values.gateway.configuration.backup.persistentVolumeClaim.storageClassName | quote }}
+  {{- end }}
+  accessModes:
+    - {{ .Values.gateway.configuration.backup.persistentVolumeClaim.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.gateway.configuration.backup.persistentVolumeClaim.size }}
+{{- end }}

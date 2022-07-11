@@ -16,6 +16,14 @@ fullnameOverride: ""
 gateway:
   configuration:
     uri: 
+    backup:
+      enabled: false
+      persistentVolumeClaim:
+        existingName: ""
+        create: true
+        storageClassName: null
+        accessMode: ReadWriteMany
+        size: 50Mi
   auth:
     # When an existing secret is configured, the value specified here will not be used
     key: 

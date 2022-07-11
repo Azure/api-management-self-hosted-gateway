@@ -67,6 +67,11 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.gateway.configuration.backup.enabled }}
+          volumeMounts:
+            - mountPath: /apim/config
+              name: {{ include "azure-api-management-gateway.fullname" . }}
+          {{- end }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -111,3 +116,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- if .Values.gateway.configuration.backup.enabled }}
+      volumes:
+        - name: {{ include "azure-api-management-gateway.fullname" . }}
+          persistentVolumeClaim:
+              {{ if .Values.gateway.configuration.backup.persistentVolumeClaim.create -}}
+              claimName: {{ include "azure-api-management-gateway.fullname" . }}
+              {{ else -}}
+              claimName: {{ .Values.gateway.configuration.backup.persistentVolumeClaim.existingName }}
+              {{- end }}
+      {{- end }}
