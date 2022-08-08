@@ -38,8 +38,14 @@ spec:
           env:
           - name: runtime.deployment.mechanism
             value: "Helm"
+          - name: runtime.deployment.artifact.version
+            value: {{ .Chart.Version }}
           - name: runtime.deployment.orchestrator.type
             value: "Kubernetes"
+          - name: runtime.deployment.highAvailability.enabled
+            value: {{ .Values.highAvailability.enabled }}
+          - name: runtime.deployment.dapr.enabled
+            value: {{ .Values.dapr.enabled }}
           - name: config.service.auth
             valueFrom:
               secretKeyRef:
