@@ -47,7 +47,7 @@ jobs:
     name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Helm install
       uses: Azure/setup-helm@v1
