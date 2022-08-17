@@ -1,7 +1,16 @@
 name: Helm Chart CI
-on: 
+on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-  pull_request_target:
+  pull_request:
+
+env:
+  # This is a test key and not related to production
+  # We cannot use GitHub's secrets, or the CI will always fail in PRs given they are not provided to forks
+  # pull_request_target can be an alternative but always runs from the main branch's context https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target
+  GATEWAY_TEST_KEY: "GatewayKey GitHub&202209161329&4riPnTDEJ76ayXZbGQTy2Xv02cnVWi5vgXVQhg84MDUV7AwiLAr0PdnBUlvwBYz/J3TONn/dMboeW9AQ7apTjg=="
 
 jobs:
   lint-helm-3-x:
@@ -9,23 +18,15 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
-      if: github.event_name != 'pull_request_target'
       with:
         fetch-depth: 0
-
-    - name: Check out code (PR)
-      uses: actions/checkout@v3
-      if: github.event_name == 'pull_request_target'
-      with:
-        fetch-depth: 0
-        ref: ${{ github.head_ref }}
 
     - name: Helm install
       uses: Azure/setup-helm@v1
 
     - name: Lint 'azure-api-management-gateway' Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
-      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}"
+      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}"
 
   deploy-helm-3-x:
     runs-on: ubuntu-latest
@@ -58,16 +59,8 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
-      if: github.event_name != 'pull_request_target'
       with:
         fetch-depth: 0
-
-    - name: Check out code (PR)
-      uses: actions/checkout@v3
-      if: github.event_name == 'pull_request_target'
-      with:
-        fetch-depth: 0
-        ref: ${{ github.head_ref }}
 
     - name: Helm install
       uses: Azure/setup-helm@v1
@@ -94,10 +87,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ secrets.GATEWAY_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ secrets.GATEWAY_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
