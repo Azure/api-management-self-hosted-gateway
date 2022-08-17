@@ -49,6 +49,10 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v3
 
+    - name: Dump Deployment spec for troubleshooting
+      run: |
+        cat ./helm-charts/azure-api-management-gateway/templates/deployment.yaml
+
     - name: Helm install
       uses: Azure/setup-helm@v1
       
