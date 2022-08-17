@@ -69,10 +69,6 @@ jobs:
         fetch-depth: 0
         ref: ${{ github.head_ref }}
 
-    - name: Dump Deployment spec for troubleshooting
-      run: |
-        cat ./helm-charts/azure-api-management-gateway/templates/deployment.yaml
-
     - name: Helm install
       uses: Azure/setup-helm@v1
       
