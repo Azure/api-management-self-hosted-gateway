@@ -39,21 +39,21 @@ spec:
           - name: runtime.deployment.mechanism
             value: "Helm"
           - name: runtime.deployment.artifact.version
-            value: {{ .Chart.Version }}
+            value: {{ .Chart.Version | quote }}
           - name: runtime.deployment.orchestrator.type
             value: "Kubernetes"
           - name: runtime.deployment.highAvailability.enabled
-            value: {{ .Values.highAvailability.enabled }}
+            value: {{ .Values.highAvailability.enabled | quote }}
           - name: runtime.deployment.dapr.enabled
-            value: {{ .Values.dapr.enabled }}
+            value: {{ .Values.dapr.enabled | quote }}
           - name: config.service.auth
             valueFrom:
               secretKeyRef:
-                {{ if .Values.secret.createSecret -}}
+                {{- if .Values.secret.createSecret }}
                 name: {{ include "azure-api-management-gateway.fullname" . }}
-                {{ else }}
+                {{- else }}
                 name: {{ .Values.secret.existingSecretName }}
-                {{ end }}
+                {{- end }}
                 key: gateway-key
           envFrom:
           - configMapRef:
