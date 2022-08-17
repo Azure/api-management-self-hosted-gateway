@@ -49,11 +49,11 @@ spec:
           - name: config.service.auth
             valueFrom:
               secretKeyRef:
-                {{ if .Values.secret.createSecret -}}
+                {{- if .Values.secret.createSecret }}
                 name: {{ include "azure-api-management-gateway.fullname" . }}
-                {{ else }}
+                {{- else }}
                 name: {{ .Values.secret.existingSecretName }}
-                {{ end }}
+                {{- end }}
                 key: gateway-key
           envFrom:
           - configMapRef:
