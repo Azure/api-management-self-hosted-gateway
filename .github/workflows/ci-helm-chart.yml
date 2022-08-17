@@ -9,8 +9,16 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
+      if: github.event_name != 'pull_request_target'
       with:
         fetch-depth: 0
+
+    - name: Check out code (PR)
+      uses: actions/checkout@v3
+      if: github.event_name == 'pull_request_target'
+      with:
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
 
     - name: Helm install
       uses: Azure/setup-helm@v1
@@ -50,8 +58,16 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v3
+      if: github.event_name != 'pull_request_target'
       with:
         fetch-depth: 0
+
+    - name: Check out code (PR)
+      uses: actions/checkout@v3
+      if: github.event_name == 'pull_request_target'
+      with:
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
 
     - name: Helm install
       uses: Azure/setup-helm@v1
