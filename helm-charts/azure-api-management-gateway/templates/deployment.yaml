@@ -40,6 +40,8 @@ spec:
             value: "Helm"
           - name: runtime.deployment.artifact.version
             value: {{ .Chart.Version | quote }}
+          - name: runtime.deployment.artifact.source
+            value: "Official"
           - name: runtime.deployment.orchestrator.type
             value: "Kubernetes"
           - name: runtime.deployment.highAvailability.enabled
