@@ -3,7 +3,7 @@ version: 1.4.1
 appVersion: 2.1.4
 # Specify the Kubernetes version range that we support.
 # We allow pre-release versions for cloud-specific Kubernetes versions such as  v1.21.5-gke.1302 or v1.18.9-eks-d1db3c
-kubeVersion: ">=v1.17.0-0"
+kubeVersion: ">=v1.20.0-0"
 name: azure-api-management-gateway
 description: A Helm chart to deploy the self-hosted gateway of Azure API Management on Kubernetes
 home: https://azure.microsoft.com/en-us/services/api-management/
