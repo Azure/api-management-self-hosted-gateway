@@ -24,6 +24,7 @@ spec:
         dapr.io/log-level: {{ .Values.dapr.logging.level | quote }}
       {{- end }}
     spec:
+      terminationGracePeriodSeconds: {{ .Values.gateway.deployment.terminationGracePeriodSeconds }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
