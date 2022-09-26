@@ -21,7 +21,7 @@ gateway:
       # type: RollingUpdate
       # rollingUpdate:
       #   maxUnavailable: 0
-      #   maxSurge: 25%imagePullSecrets: []
+      #   maxSurge: 25%
   configuration:
     uri: 
     backup:
