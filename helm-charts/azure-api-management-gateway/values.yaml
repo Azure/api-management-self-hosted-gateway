@@ -15,6 +15,7 @@ fullnameOverride: ""
 
 gateway:
   deployment:
+    terminationGracePeriodSeconds: 60
     strategy: {}
       # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
       # type: RollingUpdate
