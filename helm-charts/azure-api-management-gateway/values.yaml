@@ -99,6 +99,9 @@ service:
   ports:
     http: 8080
     https: 8081
+    instance:
+      synchronization: 4290
+      heartbeat: 4291
   annotations: {}
 
 ingress:

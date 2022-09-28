@@ -55,6 +55,8 @@ spec:
             value: {{ .Values.highAvailability.enabled | quote }}
           - name: runtime.deployment.dapr.enabled
             value: {{ .Values.dapr.enabled | quote }}
+          - name: neighborhood.host
+            value: {{ include "azure-api-management-gateway.instanceDiscoveryService" . }}
           - name: config.service.auth
             valueFrom:
               secretKeyRef:
@@ -72,10 +74,14 @@ spec:
               containerPort: 8080
             - name: https
               containerPort: 8081
-          readinessProbe:
-            {{- toYaml .Values.probes.readiness | nindent 12 }}
-          livenessProbe:
-            {{- toYaml .Values.probes.liveness | nindent 12 }}
+              # Container port used for rate limiting to discover instances
+            - name: rate-limit-dc
+              protocol: UDP
+              containerPort: {{ .Values.service.ports.instance.synchronization }}
+              # Container port used for instances to send heartbeats to each other
+            - name: dc-heartbeat
+              protocol: UDP
+              containerPort: {{ .Values.service.ports.instance.heartbeat }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.securityContext }}
