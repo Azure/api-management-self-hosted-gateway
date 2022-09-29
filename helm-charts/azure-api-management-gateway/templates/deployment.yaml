@@ -81,7 +81,7 @@ spec:
               # Container port used for instances to send heartbeats to each other
             - name: dc-heartbeat
               protocol: UDP
-              containerPort: {{ .Values.service.ports.instance.heartbeat }}          readinessProbe:
+              containerPort: {{ .Values.service.ports.instance.heartbeat }}
           readinessProbe:
             {{- toYaml .Values.probes.readiness | nindent 12 }}
           livenessProbe:
