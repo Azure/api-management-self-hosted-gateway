@@ -82,10 +82,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
