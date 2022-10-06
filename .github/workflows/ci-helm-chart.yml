@@ -73,9 +73,6 @@ jobs:
           echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
           echo "::add-mask::$GATEWAY_TOKEN"
           echo "::set-output name=gatewayToken::$GATEWAY_TOKEN"
-    - run: |
-          echo This is a test for $GATEWAY_CONFIG_URL
-          echo This is a test for ${{ steps.fetched-secrets.outputs.configurationUrl }}
 
     - name: Helm install
       uses: Azure/setup-helm@v1
