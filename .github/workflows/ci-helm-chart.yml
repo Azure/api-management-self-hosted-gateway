@@ -6,12 +6,9 @@ on:
   workflow_dispatch:
   pull_request:
 
-env:
-  GATEWAY_CONFIG_URL: apim-oss.configuration.azure-api.net
-  # This is a test key and not related to production
-  # We cannot use GitHub's secrets, or the CI will always fail in PRs given they are not provided to forks
-  # pull_request_target can be an alternative but always runs from the main branch's context https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target
-  GATEWAY_TEST_KEY: "GatewayKey GitHub&202209161329&4riPnTDEJ76ayXZbGQTy2Xv02cnVWi5vgXVQhg84MDUV7AwiLAr0PdnBUlvwBYz/J3TONn/dMboeW9AQ7apTjg=="
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   lint-helm-3-x:
@@ -27,7 +24,7 @@ jobs:
 
     - name: Lint 'azure-api-management-gateway' Helm chart
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
-      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}"
+      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="GatewayKey xyz"
 
   deploy-helm-3-x:
     runs-on: ubuntu-latest
@@ -57,6 +54,26 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Authenticate to Azure
+      uses: azure/login@v1
+      with:
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ secrets.AZURE_CI_CLIENT_ID }}
+
+    - name: Get gateway secrets from Azure Key Vault
+      id: fetched-secrets
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az account show
+          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
+          GATEWAY_TOKEN=$(az keyvault secret show --name "Gateway-Token" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
+          echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
+          echo "::add-mask::$GATEWAY_TOKEN"
+          echo "::set-output name=gatewayToken::$GATEWAY_TOKEN"
+
     - name: Helm install
       uses: Azure/setup-helm@v1
       
@@ -82,10 +99,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ env.GATEWAY_CONFIG_URL }}" --set gateway.auth.key="${{ env.GATEWAY_TEST_KEY }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
