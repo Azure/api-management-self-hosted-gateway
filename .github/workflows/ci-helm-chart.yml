@@ -77,8 +77,11 @@ jobs:
           az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }}
           echo "Done!"
           az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }} --query "value"
+          echo "Done 2!"
           GATEWAY_CONFIG_URL=(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }} --query "value")
+          echo "Done3!"
           GATEWAY_TOKEN=(az keyvault secret show --name "Gateway-Token" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
+          echo "Done4!"
           echo $GATEWAY_CONFIG_URL
           echo "outputting"
           $GATEWAY_CONFIG_URL >> $GITHUB_ENV
