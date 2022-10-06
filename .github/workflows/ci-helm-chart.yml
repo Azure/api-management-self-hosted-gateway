@@ -85,8 +85,6 @@ jobs:
           echo $GATEWAY_CONFIG_URL
           echo "outputting"
           $GATEWAY_CONFIG_URL >> $GITHUB_ENV
-          echo "::add-mask::$GATEWAY_CONFIG_URL_MASKED"
-          echo GATEWAY_CONFIG_URL_MASKED=$GATEWAY_CONFIG_URL_MASKED >> $GITHUB_ENV
     - run: |
           echo This is a test for $GATEWAY_CONFIG_URL
           echo This is a test for $GATEWAY_CONFIG_URL_MASKED
