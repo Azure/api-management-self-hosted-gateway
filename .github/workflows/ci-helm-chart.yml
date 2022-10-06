@@ -74,7 +74,7 @@ jobs:
         azcliversion: 2.30.0
         inlineScript: |
           az account show
-          GATEWAY_CONFIG_URL=(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
+          GATEWAY_CONFIG_URL=(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }} --query "value")
           GATEWAY_TOKEN=(az keyvault secret show --name "Gateway-Token" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
           echo $GATEWAY_CONFIG_URL
           echo $GATEWAY_CONFIG_URL
