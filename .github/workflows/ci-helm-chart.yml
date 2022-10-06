@@ -75,13 +75,17 @@ jobs:
         inlineScript: |
           az account show
           az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }}
+          echo "Done!"
+          az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }} --query "value"
           GATEWAY_CONFIG_URL=(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name ${{ secrets.AZURE_KEY_VAULT_NAME }} --query "value")
           GATEWAY_TOKEN=(az keyvault secret show --name "Gateway-Token" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
           echo $GATEWAY_CONFIG_URL
-          echo $GATEWAY_CONFIG_URL
+          echo "outputting"
+          $GATEWAY_CONFIG_URL >> $GITHUB_ENV
           echo "::add-mask::$GATEWAY_CONFIG_URL_MASKED"
           echo GATEWAY_CONFIG_URL_MASKED=$GATEWAY_CONFIG_URL_MASKED >> $GITHUB_ENV
     - run: |
+          echo This is a test for $GATEWAY_CONFIG_URL
           echo This is a test for $GATEWAY_CONFIG_URL_MASKED
 
     - name: Helm install
