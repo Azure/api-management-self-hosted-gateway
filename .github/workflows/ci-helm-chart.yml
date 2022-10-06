@@ -69,6 +69,7 @@ jobs:
         client-id: ${{ secrets.AZURE_CI_CLIENT_ID }}
 
     - name: Azure CLI script
+      id: fetched-secrets
       uses: azure/CLI@v1
       with:
         azcliversion: 2.30.0
@@ -84,10 +85,10 @@ jobs:
           echo "Done4!"
           echo $GATEWAY_CONFIG_URL
           echo "outputting"
-          echo $GATEWAY_CONFIG_URL >> $GITHUB_ENV
+          echo "::set-output name=h::$GATEWAY_CONFIG_URL"
     - run: |
           echo This is a test for $GATEWAY_CONFIG_URL
-          echo This is a test for $GATEWAY_CONFIG_URL_MASKED
+          echo This is a test for $${{ steps.fetched-secrets.outputs.h }}
 
     - name: Helm install
       uses: Azure/setup-helm@v1
