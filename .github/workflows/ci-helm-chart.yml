@@ -71,6 +71,7 @@ jobs:
           GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
           GATEWAY_TOKEN=$(az keyvault secret show --name "Gateway-Token" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
           echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
+          echo "::add-mask::$GATEWAY_TOKEN"
           echo "::set-output name=gatewayToken::$GATEWAY_TOKEN"
     - run: |
           echo This is a test for $GATEWAY_CONFIG_URL
@@ -101,10 +102,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ steps.fetched-secrets.outputs.configurationUrl }}" --set gateway.auth.key="${{ steps.fetched-secrets.outputs.gatewayToken }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="${{ steps.fetched-secrets.outputs.configurationUrl }}" --set gateway.auth.key="${{ steps.fetched-secrets.outputs.gatewayToken }}" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --values ./test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
