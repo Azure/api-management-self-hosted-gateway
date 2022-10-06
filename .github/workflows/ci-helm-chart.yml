@@ -84,7 +84,7 @@ jobs:
           echo "Done4!"
           echo $GATEWAY_CONFIG_URL
           echo "outputting"
-          $GATEWAY_CONFIG_URL >> $GITHUB_ENV
+          echo $GATEWAY_CONFIG_URL >> $GITHUB_ENV
     - run: |
           echo This is a test for $GATEWAY_CONFIG_URL
           echo This is a test for $GATEWAY_CONFIG_URL_MASKED
