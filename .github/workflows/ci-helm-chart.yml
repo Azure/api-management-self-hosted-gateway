@@ -9,6 +9,11 @@ on:
 permissions:
   id-token: write
   contents: read
+  
+env:
+  AZURE_TENANT_ID: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  AZURE_SUBSCRIPTION_ID: a200340d-6b82-494d-9dbf-687ba6e33f9e
+  AZURE_CI_CLIENT_ID: 359b42a2-78a3-49e7-9be3-6ddfd1a27329
 
 jobs:
   lint-helm-3-x:
@@ -57,9 +62,9 @@ jobs:
     - name: Authenticate to Azure
       uses: azure/login@v1
       with:
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        client-id: ${{ secrets.AZURE_CI_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ env.AZURE_CI_CLIENT_ID }}
 
     - name: Get gateway secrets from Azure Key Vault
       id: fetched-secrets
