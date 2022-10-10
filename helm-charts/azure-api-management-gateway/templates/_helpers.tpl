@@ -55,3 +55,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "azure-api-management-gateway.disruptionname" -}}
 {{ include "azure-api-management-gateway.fullname" . | trunc 52 | trimSuffix "-" }}-disruption
 {{- end }}
+
+{{/*
+    Provide a name for our instance discovery service.
+*/}}
+{{- define "azure-api-management-gateway.instanceDiscoveryService" -}}
+{{ include "azure-api-management-gateway.fullname" . | trunc 44 | trimSuffix "-" }}-instance-discovery
+{{- end -}}

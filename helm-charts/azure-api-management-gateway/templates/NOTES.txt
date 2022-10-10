@@ -1,10 +1,12 @@
 The self-hosted gateway of Azure API Management is deployed!
 
 {{- if .Values.highAvailability.enabled }}
-It is has been deployed with high availablity inside the cluster.
+It is has been deployed with high availability inside the cluster.
 {{- else}}
-It is has been deployed without high availablity inside the cluster.
+It is has been deployed without high availability inside the cluster.
 {{- end }}
+
+All instances of the self-hosted gateway will synchronize on port {{ .Values.service.ports.instance.synchronization }} (UDP) and send heartbeats on port {{ .Values.service.ports.instance.heartbeat }} (UDP).
 
 You can find the URL by running these commands:
 {{- if .Values.ingress.enabled }}
