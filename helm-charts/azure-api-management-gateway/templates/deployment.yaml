@@ -11,7 +11,7 @@ spec:
       {{- include "azure-api-management-gateway.selectorLabels" . | nindent 6 }}
   {{- with .Values.gateway.deployment.strategy }}
   strategy:
-    {{- toYaml .Values.gateway.deployment.strategy | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   template:
     metadata:
