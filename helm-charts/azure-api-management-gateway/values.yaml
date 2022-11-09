@@ -32,6 +32,7 @@ gateway:
         storageClassName: null
         accessMode: ReadWriteMany
         size: 50Mi
+    additional: {}
   auth:
     # When an existing secret is configured, the value specified here will not be used
     key: 

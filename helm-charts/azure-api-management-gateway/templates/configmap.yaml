@@ -54,3 +54,6 @@ data:
 {{- if .Values.security.tls.client.ciphers.allowedSuites }}
   net.client.tls.ciphers.allowed-suites: {{ .Values.security.tls.client.ciphers.allowedSuites | quote }}
 {{- end }}
+{{- with .Values.gateway.configuration.additional }}
+{{- toYaml . | nindent 2 }}
+{{- end }}
