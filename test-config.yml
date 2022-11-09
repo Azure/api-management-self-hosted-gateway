@@ -1,5 +1,5 @@
 ingress:
-  enabled: true
+  enabled: disable
   hosts:
     - host: chart-example.local
       paths: [
