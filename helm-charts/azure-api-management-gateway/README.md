@@ -71,7 +71,7 @@ The following table lists the configurable parameters of the self-hosted Azure A
 their default values.
 
 | Parameter | Description | Default |
-| :----------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------- |
+| :----------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
 | `image.repository` | Repository which provides the image | `mcr.microsoft.com/azure-api-management/gateway` |
 | `image.tag` | Tag of image to use | N/A, defaults to app version of Helm chart |
 | `image.pullPolicy` | Policy to pull image | `IfNotPresent` |
@@ -121,6 +121,7 @@ their default values.
 | `ingress.annotations` | Collection of annotations to assign to the ingress | `{}` |
 | `ingress.hosts` | Host to expose ingress on | |
 | `ingress.tls` | Configuration for TLS on the ingress | None |
+| `ingress.ingressClassName` | Configuration of the ingress class to be used | |
 | `serviceAccountName` | Configuration of the serviceAccountName used | default |
 | `highAvailability.enabled` | Indication wheter or not the gateway should be scheduled highly available in the cluster. | `false` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |
