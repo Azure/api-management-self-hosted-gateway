@@ -122,7 +122,7 @@ their default values.
 | `ingress.hosts` | Host to expose ingress on | |
 | `ingress.tls` | Configuration for TLS on the ingress | None |
 | `ingress.ingressClassName` | Configuration of the ingress class to be used | |
-| `ingress.useHttpsBackend` | Indication whether or not the https port of the service should be used | |
+| `ingress.useHttpsBackend` | Indication whether or not the https port of the service should be used | `false` |
 | `serviceAccountName` | Configuration of the serviceAccountName used | default |
 | `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `false` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |

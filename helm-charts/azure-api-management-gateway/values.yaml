@@ -112,6 +112,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
+      useHttpsBackend: false
       paths: []
 
   tls: []
