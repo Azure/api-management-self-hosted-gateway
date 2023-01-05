@@ -22,6 +22,11 @@ gateway:
       # rollingUpdate:
       #   maxUnavailable: 0
       #   maxSurge: 25%
+    dns:
+      hostAliases: {}
+        # - ip: "<ip address>"
+        #   hostnames:
+        #   - "<instanceName>.configuration.azure-api.net"      
     #annotations:
     #  com.example/local: "test"
   configuration:

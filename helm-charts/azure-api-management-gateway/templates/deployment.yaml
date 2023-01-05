@@ -33,6 +33,10 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      {{- with .Values.gateway.deployment.dns.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}       
       {{- if .Values.gateway.deployment.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.gateway.deployment.terminationGracePeriodSeconds }}
       {{- end }}
