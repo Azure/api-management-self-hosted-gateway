@@ -22,6 +22,8 @@ gateway:
       # rollingUpdate:
       #   maxUnavailable: 0
       #   maxSurge: 25%
+    #annotations:
+    #  com.example/local: "test"
   configuration:
     uri: 
     backup:
