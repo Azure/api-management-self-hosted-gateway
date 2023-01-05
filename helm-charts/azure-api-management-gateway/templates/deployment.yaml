@@ -28,7 +28,7 @@ spec:
         dapr.io/log-level: {{ .Values.dapr.logging.level | quote }}
       {{- end }}
     spec:
-      {{- with .Values.gateway.deployment.hostAliases }}
+      {{- with .Values.gateway.deployment.dns.hostAliases }}
       hostAliases:
         {{- toYaml . | nindent 8 }}
       {{- end }}       
