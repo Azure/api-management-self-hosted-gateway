@@ -17,15 +17,20 @@ spec:
     metadata:
       labels:
         {{- include "azure-api-management-gateway.selectorLabels" . | nindent 8 }}
-      {{- if .Values.dapr.enabled -}}
+      {{- if or .Values.dapr.enabled .Values.gateway.deployment.annotations }}
       annotations:
+        {{- if .Values.gateway.deployment.annotations -}}
+          {{- toYaml .Values.gateway.deployment.annotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.dapr.enabled }}
         dapr.io/enabled: "true"
         {{ if .Values.dapr.app.id -}}
         dapr.io/app-id: {{ .Values.dapr.app.id | quote }}
-        {{ end }}
+        {{- end }}
         dapr.io/config: {{ .Values.dapr.config | quote }}
         dapr.io/log-as-json: {{ .Values.dapr.logging.useJsonOutput | quote }}
         dapr.io/log-level: {{ .Values.dapr.logging.level | quote }}
+        {{- end }}
       {{- end }}
     spec:
       {{- with .Values.gateway.deployment.dns.hostAliases }}

@@ -27,6 +27,8 @@ gateway:
         # - ip: "<ip address>"
         #   hostnames:
         #   - "<instanceName>.configuration.azure-api.net"      
+    #annotations:
+    #  com.example/local: "test"
   configuration:
     uri: 
     backup:
@@ -117,6 +119,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
+      useHttpsBackend: false
       paths: []
 
   tls: []

@@ -2,6 +2,7 @@
 {{- if  and (.Values.ingress.enabled) ($doesSupportStableIngress) -}}
 {{- $fullName := include "azure-api-management-gateway.fullname" . -}}
 {{- $httpPort := .Values.service.ports.http -}}
+{{- $httpsPort := .Values.service.ports.https -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -27,8 +28,8 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+  {{- range $host := .Values.ingress.hosts }}
+    - host: {{ $host.host | quote }}
       http:
         paths:
         {{- range .paths }}
@@ -38,7 +39,11 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
+                {{- if $host.useHttpsBackend }}
+                  number: {{ default $httpsPort }}
+                {{- else }}
                   number: {{ $httpPort }}
+                {{- end }}
         {{- end }}
   {{- end }}
 {{- end }}

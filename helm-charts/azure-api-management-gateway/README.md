@@ -77,6 +77,7 @@ their default values.
 | `image.pullPolicy` | Policy to pull image | `IfNotPresent` |
 | `gateway.deployment.terminationGracePeriodSeconds` | Determines the maximum time the Pod may spend in the Terminating phase. Learn more [about the termination of Pods](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution) | `60` |
 | `gateway.deployment.strategy` | Specifies the deployment [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) to use for replacing old pods by new ones. May be `Recreate` or `RollingUpdate` | `{}` |
+| `gateway.deployment.annotations` | Specify additonal custom annotations to be set for the deployment manifest | |
 | `gateway.configuration.uri` | Endpoint in Azure API Management to which every self-hosted agent has to connect | |
 | `gateway.configuration.backup.enabled` | If enabled will store a backup copy of the latests downloaded configuration on a storage volume | `false` |
 | `gateway.configuration.backup.persistentVolumeClaim.existingName` | Use an existing Persistent Volume Claim (PVC) instead of creating one. *.persistentVolumeClaim.create needs to be false | `""` |
@@ -113,18 +114,19 @@ their default values.
 | `service.ports.https` | Port for HTTPs traffic on service for other pods to talk to | `8081` |
 | `service.ports.instance.synchronization` | Port used for internal discovery of gateway instances to synchronize across all of them, ie for rate limiting. | `4290` |
 | `service.ports.instance.heartbeat` | Port used for sending heartbeats to all instances for synchronization purposes. | `4291` |
-| `dapr.enabled` | Indication wheter or not Dapr integration should be used | `false` |
+| `dapr.enabled` | Indication whether or not Dapr integration should be used | `false` |
 | `dapr.app.id` | Application ID to use for Dapr integration | None |
 | `dapr.config` | Defines which Configuration CRD Dapr should use | `tracing` |
 | `dapr.logging.level` | Level of log verbosity of Dapr sidecar | `info` |
-| `dapr.logging.useJsonOutput` | Indication wheter or not logging should be in JSON format | `true` |
-| `ingress.enabled` | Indication wheter or not an ingress should be created. Ingress support is in experimental phase, learn more [here](https://github.com/Azure/api-management-self-hosted-gateway-ingress). | `false` |
+| `dapr.logging.useJsonOutput` | Indication whether or not logging should be in JSON format | `true` |
+| `ingress.enabled` | Indication whether or not an ingress should be created. Ingress support is in experimental phase, learn more [here](https://github.com/Azure/api-management-self-hosted-gateway-ingress). | `false` |
 | `ingress.annotations` | Collection of annotations to assign to the ingress | `{}` |
 | `ingress.hosts` | Host to expose ingress on | |
 | `ingress.tls` | Configuration for TLS on the ingress | None |
 | `ingress.ingressClassName` | Configuration of the ingress class to be used | |
+| `ingress.useHttpsBackend` | Indication whether or not the https port of the service should be used | `false` |
 | `serviceAccountName` | Configuration of the serviceAccountName used | default |
-| `highAvailability.enabled` | Indication wheter or not the gateway should be scheduled highly available in the cluster. | `false` |
+| `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `false` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |
 | `highAvailability.podTopologySpread.whenUnsatisfiable` | Indication how pods should be spread across nodes in case the requirement cannot be met. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/) | `ScheduleAnyway` |
 | `security.tls.server.ciphers.allowedSuites` | A comma-separated list of ciphers to use for the TLS connection between the API client and the self-hosted gateway. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). | Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites). |
