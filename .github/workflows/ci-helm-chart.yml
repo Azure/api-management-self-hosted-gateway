@@ -103,11 +103,11 @@ jobs:
 
     - name: Describe Control-Plane Node
       run: |
-        kubectl describe nodes/control-plane
+        kubectl describe nodes/chart-testing-control-plane
 
     - name: Describe Worker Node
       run: |
-        kubectl describe nodes/worker
+        kubectl describe nodes/chart-testing-worker
 
     - name: Show Kubernetes nodes
       run: |
