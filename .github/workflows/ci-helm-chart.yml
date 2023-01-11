@@ -38,20 +38,22 @@ jobs:
       fail-fast: false
       matrix:
         enableHighAvailability: [false, true]
-        kubernetesVersion: [v1.24, v1.23, v1.22, v1.21, v1.20]
+        kubernetesVersion: [v1.25, v1.24, v1.23, v1.22, v1.21, v1.20]
         include:
           # Images are defined on every Kind release
           # See https://github.com/kubernetes-sigs/kind/releases for an overview of the images
+        - kubernetesVersion: v1.25
+          kindImage: kindest/node:v1.25.3@sha256:f52781bc0d7a19fb6c405c2af83abfeb311f130707a0e219175677e366cc45d1
         - kubernetesVersion: v1.24
-          kindImage: kindest/node:v1.24.0@sha256:406fd86d48eaf4c04c7280cd1d2ca1d61e7d0d61ddef0125cb097bc7b82ed6a1
+          kindImage: kindest/node:v1.24.7@sha256:577c630ce8e509131eab1aea12c022190978dd2f745aac5eb1fe65c0807eb315
         - kubernetesVersion: v1.23
-          kindImage: kindest/node:v1.23.6@sha256:1af0f1bee4c3c0fe9b07de5e5d3fafeb2eec7b4e1b268ae89fcab96ec67e8355
+          kindImage: kindest/node:v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61
         - kubernetesVersion: v1.22
-          kindImage: kindest/node:v1.22.9@sha256:6e57a6b0c493c7d7183a1151acff0bfa44bf37eb668826bf00da5637c55b6d5e
+          kindImage: kindest/node:v1.22.15@sha256:7d9708c4b0873f0fe2e171e2b1b7f45ae89482617778c1c875f1053d4cef2e41
         - kubernetesVersion: v1.21
-          kindImage: kindest/node:v1.21.12@sha256:ae05d44cc636ee961068399ea5123ae421790f472c309900c151a44ee35c3e3e
+          kindImage: kindest/node:v1.21.14@sha256:9d9eb5fb26b4fbc0c6d95fa8c790414f9750dd583f5d7cee45d92e8c26670aa1
         - kubernetesVersion: v1.20
-          kindImage: kindest/node:v1.20.15@sha256:a6ce604504db064c5e25921c6c0fffea64507109a1f2a512b1b562ac37d652f3
+          kindImage: kindest/node:v1.20.15@sha256:a32bf55309294120616886b5338f95dd98a2f7231519c7dedcec32ba29699394
     name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
@@ -87,10 +89,23 @@ jobs:
       with:
         version: v0.13.0
         node_image: ${{ matrix.kindImage }}
+        config: ./testing/kind-cluster.yml
 
     - name: Show Kubernetes version
       run: |
         kubectl version
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Describe Control-Plane Node
+      run: |
+        kubectl describe nodes/control-plane
+
+    - name: Describe Worker Node
+      run: |
+        kubectl describe nodes/worker
 
     - name: Show Kubernetes nodes
       run: |
@@ -104,10 +119,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
