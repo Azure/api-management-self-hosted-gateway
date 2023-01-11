@@ -5,3 +5,14 @@ ingress:
       paths: [
         "/api/v1/products"
       ]
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - somenode1.test.com
+          - somenode2.test.com
+          - somenode3.test.com

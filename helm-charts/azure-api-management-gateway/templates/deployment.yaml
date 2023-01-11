@@ -111,7 +111,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 {{- if .Values.highAvailability.enabled }}
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.Version }}
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
@@ -120,32 +119,14 @@ spec:
           matchLabels:
             {{- include "azure-api-management-gateway.selectorLabels" . | nindent 12 }}
 {{- end }}
-{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{- if .Values.affinity }}
+    {{- with .Values.affinity }}
       affinity:
-        {{- toYaml .Values.affinity | nindent 8 }}
-{{- if semverCompare "<1.19-0" .Capabilities.KubeVersion.Version }}
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values:
-                  - {{ include "azure-api-management-gateway.name" . }}
-                - key: app.kubernetes.io/instance
-                  operator: In
-                  values:
-                  - {{ .Release.Name }}
-              topologyKey: topology.kubernetes.io/zone
-{{- end -}}
-{{- end }}
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
