@@ -125,9 +125,9 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+{{- if .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
 {{- if semverCompare "<1.19-0" .Capabilities.KubeVersion.Version }}
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -145,7 +145,7 @@ spec:
                   - {{ .Release.Name }}
               topologyKey: topology.kubernetes.io/zone
 {{- end -}}
-    {{- end }}
+{{- end }}
     {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
