@@ -1,6 +1,6 @@
 apiVersion: v2
-version: 1.5.3
-appVersion: 2.1.6
+version: 1.5.4
+appVersion: 2.1.7
 # Specify the Kubernetes version range that we support.
 # We allow pre-release versions for cloud-specific Kubernetes versions such as  v1.21.5-gke.1302 or v1.18.9-eks-d1db3c
 kubeVersion: ">=v1.20.0-0"
