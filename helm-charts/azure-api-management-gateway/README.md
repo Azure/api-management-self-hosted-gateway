@@ -109,8 +109,8 @@ their default values.
 | `observability.statsD.sampling` | Defines the metrics sampling rate. Value can be between `0` and `1`. e.g., `0.5`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics). | 1 |
 | `observability.statsD.tagFormat` | Defines the [tagging format](https://github.com/prometheus/statsd_exporter#tagging-extensions) in StatsD metrics as per the official docs. Value can be `none`, `librato`, `dogStatsD`, `influxDB`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics). | N/A |
 | `service.type` | Type of Kubernetes service to use to expose to serve traffic | `ClusterIP` |
-| `service.loadBalancerIP` | Attach a pre-existing static IP to a `LoadBalancer` type service. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer). | |
 | `service.annotations` | Annotations to add to the Kubernetes service | `{}` |
+| `service.loadBalancer.ip` | Attach a pre-existing static IP to a `LoadBalancer` type service. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer). | |
 | `service.ports.http` | Port for HTTP traffic on service for other pods to talk to | `8080` |
 | `service.ports.https` | Port for HTTPs traffic on service for other pods to talk to | `8081` |
 | `service.ports.instance.synchronization` | Port used for internal discovery of gateway instances to synchronize across all of them, ie for rate limiting. | `4290` |
