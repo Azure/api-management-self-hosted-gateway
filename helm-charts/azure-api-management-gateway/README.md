@@ -75,6 +75,7 @@ their default values.
 | `image.repository` | Repository which provides the image | `mcr.microsoft.com/azure-api-management/gateway` |
 | `image.tag` | Tag of image to use | N/A, defaults to app version of Helm chart |
 | `image.pullPolicy` | Policy to pull image | `IfNotPresent` |
+| `gateway.name` | Name of the gateway in Azure API Management. Required when using Azure AD authentication. | |
 | `gateway.deployment.terminationGracePeriodSeconds` | Determines the maximum time the Pod may spend in the Terminating phase. Learn more [about the termination of Pods](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution) | `60` |
 | `gateway.deployment.strategy` | Specifies the deployment [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) to use for replacing old pods by new ones. May be `Recreate` or `RollingUpdate` | `{}` |
 | `gateway.deployment.annotations` | Specify additonal custom annotations to be set for the deployment manifest | |
@@ -86,7 +87,12 @@ their default values.
 | `gateway.configuration.backup.persistentVolumeClaim.accessMode` | Access mode for the Persistent Volume Claim (PVC) pod | `ReadWriteMany` |
 | `gateway.configuration.backup.persistentVolumeClaim.size` | Size of the Persistent Volume Claim (PVC) to be created | `50Mi` |
 | `gateway.configuration.additional` | Capability to specify a list of settings to add which are not supported by the Helm chart yet. | `{}` |
+| `gateway.auth.type` | Type of authentication to use for Azure API Management's Configuration API. Options are `GatewayToken` or `AzureAdApp`. | `GatewayToken` |
 | `gateway.auth.key` | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey` | |
+| `gateway.auth.azureAd.tenant.id` | ID of the Azure AD tenant. Required when authentication type is `AzureAdApp` | |
+| `gateway.auth.azureAd.app.id` | Client ID of the Azure AD app to authenticate with (also known as application ID). Required when authentication type is `AzureAdApp` | |
+| `gateway.auth.azureAd.app.secret` | Secret of the Azure AD app to authenticate with. Required when authentication type is `AzureAdApp` | |
+| `gateway.auth.azureAd.authority` | Authority URL of Azure AD. | |	
 | `gateway.deployment.dns.hostAliases` | Add custom host aliases (configuration endpoint e.g.) Check the [values.yaml](./values.yaml) for the details. |  `{}` |
 | `secret.createSecret` | Indication whether or not a Kubernetes secret should be created to store the authentication token. | `true` |
 | `secret.existingSecretName` | Name of the existing secret to be used by the gateway. Requires `secret.createSecret` to be false. | |

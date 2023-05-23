@@ -1,4 +1,5 @@
 {{- $configurationUri := .Values.gateway.configuration.uri | required ".Values.gateway.configuration.uri is required." -}}
+{{- $authenticationType := .Values.gateway.auth.type | required ".Values.gateway.auth.type is required." -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,6 +8,17 @@ metadata:
     {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 data:
   config.service.endpoint: {{ $configurationUri | quote }}
+{{- if eq (lower $authenticationType) "azureadapp" }}
+  {{- $adTenantId := .Values.gateway.auth.azureAd.tenant.id | required "No Azure AD tenant ID was specified in gateway.auth.azureAd.tenant.id." }}
+  {{- $adAppid := .Values.gateway.auth.azureAd.app.id | required "No Azure AD application ID was specified in gateway.auth.azureAd.app.id." }}
+  {{- $gatewayName := .Values.gateway.name | required "No gateway name was specified in gateway.name." }}
+  gateway.name : {{ $gatewayName | quote }}
+  config.service.auth.azureAd.tenantId : {{ $adTenantId | quote }}
+  config.service.auth.azureAd.clientId : {{ $adAppid | quote }}
+  {{- if .Values.gateway.auth.azureAd.authority }}
+  config.service.auth.azureAd.authority : {{ .Values.gateway.auth.azureAd.authority | quote }}
+  {{- end }}
+{{- end }}
   telemetry.metrics.cloud: {{ .Values.observability.azureMonitor.metrics.enabled | quote }}
   telemetry.logs.std: {{ .Values.observability.logs.std.format | quote }}
   telemetry.logs.std.level: {{ .Values.observability.logs.std.level | quote }}
