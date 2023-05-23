@@ -1,8 +1,5 @@
-name: Helm Chart CI
+name: Helm Chart CI (PR)
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - 'main'
@@ -11,14 +8,9 @@ on:
 permissions:
   id-token: write
   contents: read
-  
-env:
-  AZURE_TENANT_ID: 72f988bf-86f1-41af-91ab-2d7cd011db47
-  AZURE_SUBSCRIPTION_ID: a200340d-6b82-494d-9dbf-687ba6e33f9e
-  AZURE_CI_CLIENT_ID: 359b42a2-78a3-49e7-9be3-6ddfd1a27329
 
 jobs:
-  lint-helm-3-x:
+  lint-helm:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
@@ -36,9 +28,10 @@ jobs:
     - name: Lint 'azure-api-management-gateway' Helm chart (Azure AD App)
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
       run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.type="AzureAdApp" --set gateway.name=gateway-name --set gateway.auth.azureAd.tenant.id=ci-tenant-id --set gateway.auth.azureAd.app.id=ci-app-id --set gateway.auth.azureAd.app.secret=xyz
-  deploy-helm-3-x:
+  
+  deploy-helm:
     runs-on: ubuntu-latest
-    needs: lint-helm-3-x
+    needs: lint-helm
     strategy:
       fail-fast: false
       matrix:
@@ -67,26 +60,6 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-
-    - name: Authenticate to Azure
-      uses: azure/login@v1
-      with:
-        tenant-id: ${{ env.AZURE_TENANT_ID }}
-        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-        client-id: ${{ env.AZURE_CI_CLIENT_ID }}
-
-    - name: Get gateway secrets from Azure Key Vault
-      id: fetched-secrets
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.30.0
-        inlineScript: |
-          az account show
-          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
-          GATEWAY_TOKEN=$(az keyvault secret show --name "Gateway-Token" --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "value")
-          echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
-          echo "::add-mask::$GATEWAY_TOKEN"
-          echo "::set-output name=gatewayToken::$GATEWAY_TOKEN"
 
     - name: Helm install
       uses: Azure/setup-helm@v1
@@ -126,10 +99,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="xyz" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="xyz" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway

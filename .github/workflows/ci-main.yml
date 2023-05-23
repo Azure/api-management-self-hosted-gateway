@@ -1,0 +1,216 @@
+name: Helm Chart CI (Main)
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AZURE_TENANT_ID: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  AZURE_SUBSCRIPTION_ID: a200340d-6b82-494d-9dbf-687ba6e33f9e
+  AZURE_CI_CLIENT_ID: 359b42a2-78a3-49e7-9be3-6ddfd1a27329
+
+jobs:
+  deploy-gateway-token:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        enableHighAvailability: [false, true]
+        kubernetesVersion: [v1.26, v1.25, v1.24, v1.23, v1.22, v1.21, v1.20]
+        include:
+          # Images are defined on every Kind release
+          # See https://github.com/kubernetes-sigs/kind/releases for an overview of the images
+        - kubernetesVersion: v1.26
+          kindImage: kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f
+        - kubernetesVersion: v1.25
+          kindImage: kindest/node:v1.25.8@sha256:00d3f5314cc35327706776e95b2f8e504198ce59ac545d0200a89e69fce10b7f
+        - kubernetesVersion: v1.24
+          kindImage: kindest/node:v1.24.12@sha256:1e12918b8bc3d4253bc08f640a231bb0d3b2c5a9b28aa3f2ca1aee93e1e8db16
+        - kubernetesVersion: v1.23
+          kindImage: kindest/node:v1.23.17@sha256:e5fd1d9cd7a9a50939f9c005684df5a6d145e8d695e78463637b79464292e66c
+        - kubernetesVersion: v1.22
+          kindImage: kindest/node:v1.22.17@sha256:c8a828709a53c25cbdc0790c8afe12f25538617c7be879083248981945c38693
+        - kubernetesVersion: v1.21
+          kindImage: kindest/node:v1.21.14@sha256:27ef72ea623ee879a25fe6f9982690a3e370c68286f4356bf643467c552a3888
+        - kubernetesVersion: v1.20
+          kindImage: kindest/node:v1.20.15@sha256:a32bf55309294120616886b5338f95dd98a2f7231519c7dedcec32ba29699394
+    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Authenticate to Azure
+      uses: azure/login@v1
+      with:
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ env.AZURE_CI_CLIENT_ID }}
+
+    - name: Get gateway secrets from Azure Key Vault
+      id: fetched-secrets
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az account show
+          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
+          GATEWAY_TOKEN=$(az keyvault secret show --name "Gateway-Token" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
+          echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
+          echo "::add-mask::$GATEWAY_TOKEN"
+          echo "::set-output name=gatewayToken::$GATEWAY_TOKEN"
+
+    - name: Helm install
+      uses: Azure/setup-helm@v1
+      
+    - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
+      uses: helm/kind-action@v1.2.0
+      with:
+        version: v0.13.0
+        node_image: ${{ matrix.kindImage }}
+        config: ./testing/kind-cluster.yml
+
+    - name: Show Kubernetes version
+      run: |
+        kubectl version
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Describe Control-Plane Node
+      run: |
+        kubectl describe nodes/chart-testing-control-plane
+
+    - name: Describe Worker Node
+      run: |
+        kubectl describe nodes/chart-testing-worker
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Show Helm version
+      run: |
+        helm version
+
+    - name: Create Kubernetes namespace
+      run: kubectl create ns apim-gateway
+
+    - name: Template Helm chart
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+
+    - name: Install Helm chart
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.key=${{ steps.fetched-secrets.outputs.gatewayToken }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+
+    - name: Show Kubernetes resources
+      run: kubectl get all --namespace apim-gateway
+      if: always()
+
+    - name: Show Logs for Self-Hosted Gateway
+      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway
+      if: always()
+
+  deploy-azure-ad:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        enableHighAvailability: [false, true]
+        kubernetesVersion: [v1.26, v1.25, v1.24, v1.23, v1.22, v1.21, v1.20]
+        include:
+          # Images are defined on every Kind release
+          # See https://github.com/kubernetes-sigs/kind/releases for an overview of the images
+        - kubernetesVersion: v1.26
+          kindImage: kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f
+        - kubernetesVersion: v1.25
+          kindImage: kindest/node:v1.25.8@sha256:00d3f5314cc35327706776e95b2f8e504198ce59ac545d0200a89e69fce10b7f
+        - kubernetesVersion: v1.24
+          kindImage: kindest/node:v1.24.12@sha256:1e12918b8bc3d4253bc08f640a231bb0d3b2c5a9b28aa3f2ca1aee93e1e8db16
+        - kubernetesVersion: v1.23
+          kindImage: kindest/node:v1.23.17@sha256:e5fd1d9cd7a9a50939f9c005684df5a6d145e8d695e78463637b79464292e66c
+        - kubernetesVersion: v1.22
+          kindImage: kindest/node:v1.22.17@sha256:c8a828709a53c25cbdc0790c8afe12f25538617c7be879083248981945c38693
+        - kubernetesVersion: v1.21
+          kindImage: kindest/node:v1.21.14@sha256:27ef72ea623ee879a25fe6f9982690a3e370c68286f4356bf643467c552a3888
+        - kubernetesVersion: v1.20
+          kindImage: kindest/node:v1.20.15@sha256:a32bf55309294120616886b5338f95dd98a2f7231519c7dedcec32ba29699394
+    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Authenticate to Azure
+      uses: azure/login@v1
+      with:
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ env.AZURE_CI_CLIENT_ID }}
+
+    - name: Get gateway secrets from Azure Key Vault
+      id: fetched-secrets
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az account show
+          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
+          AD_APP_SECRET=$(az keyvault secret show --name "Azure-Ad-App-Secret" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
+          echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
+          echo "::add-mask::$AD_APP_SECRET"
+          echo "::set-output name=adAppSecret::$AD_APP_SECRET"
+
+    - name: Helm install
+      uses: Azure/setup-helm@v1
+      
+    - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
+      uses: helm/kind-action@v1.2.0
+      with:
+        version: v0.13.0
+        node_image: ${{ matrix.kindImage }}
+        config: ./testing/kind-cluster.yml
+
+    - name: Show Kubernetes version
+      run: |
+        kubectl version
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Describe Control-Plane Node
+      run: |
+        kubectl describe nodes/chart-testing-control-plane
+
+    - name: Describe Worker Node
+      run: |
+        kubectl describe nodes/chart-testing-worker
+
+    - name: Show Kubernetes nodes
+      run: |
+        kubectl get nodes -o wide
+
+    - name: Show Helm version
+      run: |
+        helm version
+
+    - name: Create Kubernetes namespace
+      run: kubectl create ns apim-gateway
+
+    - name: Template Helm chart
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.name=${{ env.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }}  --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+
+    - name: Install Helm chart
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.name=${{ env.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+
+    - name: Show Kubernetes resources
+      run: kubectl get all --namespace apim-gateway
+      if: always()
+
+    - name: Show Logs for Self-Hosted Gateway
+      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway
+      if: always()
