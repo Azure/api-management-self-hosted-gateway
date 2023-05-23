@@ -23,6 +23,11 @@ gateway:
       # rollingUpdate:
       #   maxUnavailable: 0
       #   maxSurge: 25%
+    network:
+      proxy:
+        http: 
+        https: 
+        bypass: 
     dns:
       hostAliases: {}
         # - ip: "<ip address>"

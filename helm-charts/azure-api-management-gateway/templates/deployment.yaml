@@ -91,6 +91,18 @@ spec:
             value: {{ .Values.dapr.enabled | quote }}
           - name: neighborhood.host
             value: {{ include "azure-api-management-gateway.instanceDiscoveryService" . }}
+          {{- if .Values.gateway.deployment.network.proxy.http }}
+          - name: HTTP_PROXY
+            value: {{ .Values.gateway.deployment.network.proxy.http | quote }}
+          {{- end }}
+          {{- if .Values.gateway.deployment.network.proxy.https }}
+          - name: HTTPS_PROXY
+            value: {{ .Values.gateway.deployment.network.proxy.https | quote }}
+          {{- end }}
+          {{- if .Values.gateway.deployment.network.proxy.bypass }}
+          - name: NO_PROXY
+            value: {{ .Values.gateway.deployment.network.proxy.bypass | quote }}
+          {{- end }}
           envFrom:
           - configMapRef:
               name: {{ include "azure-api-management-gateway.fullname" . }}

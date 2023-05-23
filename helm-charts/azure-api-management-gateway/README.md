@@ -79,6 +79,9 @@ their default values.
 | `gateway.deployment.terminationGracePeriodSeconds` | Determines the maximum time the Pod may spend in the Terminating phase. Learn more [about the termination of Pods](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution) | `60` |
 | `gateway.deployment.strategy` | Specifies the deployment [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) to use for replacing old pods by new ones. May be `Recreate` or `RollingUpdate` | `{}` |
 | `gateway.deployment.annotations` | Specify additonal custom annotations to be set for the deployment manifest | |
+| `gateway.deployment.network.proxy.http` | Address of HTTP network proxy to use for all outbound HTTP requests to the backend services (egress). | |
+| `gateway.deployment.network.proxy.https` | Address of HTTPS network proxy to use for all outbound HTTPS requests to the backend services (egress). | |
+| `gateway.deployment.network.proxy.bypass` | List of addresses/domains that should be bypassed when using an HTTP(S) network proxy. | |
 | `gateway.configuration.uri` | Endpoint in Azure API Management to which every self-hosted agent has to connect | |
 | `gateway.configuration.backup.enabled` | If enabled will store a backup copy of the latests downloaded configuration on a storage volume | `false` |
 | `gateway.configuration.backup.persistentVolumeClaim.existingName` | Use an existing Persistent Volume Claim (PVC) instead of creating one. *.persistentVolumeClaim.create needs to be false | `""` |
