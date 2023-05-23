@@ -14,6 +14,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 gateway:
+  name: 
   deployment:
     terminationGracePeriodSeconds: 60
     strategy: {}
@@ -44,6 +45,13 @@ gateway:
     type: GatewayToken
     # When an existing secret is configured, the value specified here will not be used
     key: 
+    azureAd:
+      tenant: 
+        id:
+      authority: 
+      app:
+        id: 
+        secret: 
 
 secret:
   createSecret: true

@@ -1,3 +1,4 @@
+{{- $authenticationType := .Values.gateway.auth.type | required ".Values.gateway.auth.type is required." -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,6 +53,30 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          {{- if eq (lower $authenticationType) "gatewaytoken" }}
+          - name: config.service.auth
+            valueFrom:
+              secretKeyRef:
+                {{- if .Values.secret.createSecret }}
+                name: {{ include "azure-api-management-gateway.fullname" . }}
+                {{- else }}
+                name: {{ .Values.secret.existingSecretName }}
+                {{- end }}
+                key: gateway-key
+          {{- end }}
+          {{- if eq (lower $authenticationType) "azureadapp" }}
+          - name: config.service.auth
+            value: azureAdApp
+          - name: config.service.auth.azureAd.clientSecret
+            valueFrom:
+              secretKeyRef:
+                {{- if .Values.secret.createSecret }}
+                name: {{ include "azure-api-management-gateway.fullname" . }}
+                {{- else }}
+                name: {{ .Values.secret.existingSecretName }}
+                {{- end }}
+                key: azure-ad-app-secret
+          {{- end }}
           - name: runtime.deployment.mechanism
             value: "Helm"
           - name: runtime.deployment.artifact.version
@@ -66,15 +91,6 @@ spec:
             value: {{ .Values.dapr.enabled | quote }}
           - name: neighborhood.host
             value: {{ include "azure-api-management-gateway.instanceDiscoveryService" . }}
-          - name: config.service.auth
-            valueFrom:
-              secretKeyRef:
-                {{- if .Values.secret.createSecret }}
-                name: {{ include "azure-api-management-gateway.fullname" . }}
-                {{- else }}
-                name: {{ .Values.secret.existingSecretName }}
-                {{- end }}
-                key: gateway-key
           envFrom:
           - configMapRef:
               name: {{ include "azure-api-management-gateway.fullname" . }}
