@@ -86,6 +86,7 @@ their default values.
 | `gateway.configuration.backup.persistentVolumeClaim.accessMode` | Access mode for the Persistent Volume Claim (PVC) pod | `ReadWriteMany` |
 | `gateway.configuration.backup.persistentVolumeClaim.size` | Size of the Persistent Volume Claim (PVC) to be created | `50Mi` |
 | `gateway.configuration.additional` | Capability to specify a list of settings to add which are not supported by the Helm chart yet. | `{}` |
+| `gateway.auth.type` | Type of authentication to use for Azure API Management's Configuration API. Options are `GatewayToken` or `AzureAdApp`. | `GatewayToken` |
 | `gateway.auth.key` | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey` | |
 | `gateway.deployment.dns.hostAliases` | Add custom host aliases (configuration endpoint e.g.) Check the [values.yaml](./values.yaml) for the details. |  `{}` |
 | `secret.createSecret` | Indication whether or not a Kubernetes secret should be created to store the authentication token. | `true` |

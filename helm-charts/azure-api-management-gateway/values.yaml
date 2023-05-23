@@ -41,6 +41,7 @@ gateway:
         size: 50Mi
     additional: {}
   auth:
+    type: GatewayToken
     # When an existing secret is configured, the value specified here will not be used
     key: 
 
