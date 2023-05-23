@@ -29,10 +29,13 @@ jobs:
     - name: Helm install
       uses: Azure/setup-helm@v1
 
-    - name: Lint 'azure-api-management-gateway' Helm chart
+    - name: Lint 'azure-api-management-gateway' Helm chart (Gateway Token)
       # We are using dummy gateway parameters here just to show how you can pass them as they are required
       run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="GatewayKey xyz"
 
+    - name: Lint 'azure-api-management-gateway' Helm chart (Azure AD App)
+      # We are using dummy gateway parameters here just to show how you can pass them as they are required
+      run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.type="AzureAdApp" --set gateway.name=gateway-name --set gateway.auth.azureAd.tenant.id=ci-tenant-id --set gateway.auth.azureAd.app.id=ci-app-id --set gateway.auth.azureAd.app.secret=xyz
   deploy-helm-3-x:
     runs-on: ubuntu-latest
     needs: lint-helm-3-x
