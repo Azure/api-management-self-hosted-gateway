@@ -1,6 +1,6 @@
 # Azure API Management Self-Hosted Gateway
 
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/azure-api-management)](https://artifacthub.io/packages/search?repo=azure-api-management)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/azure-api-management)](https://artifacthub.io/packages/search?repo=azure-api-management) [![Helm Chart CI (Main)](https://github.com/Azure/api-management-self-hosted-gateway/actions/workflows/ci-main.yml/badge.svg?event=push)](https://github.com/Azure/api-management-self-hosted-gateway/actions/workflows/ci-main.yml)
 
 ## What is Azure API Management Self-Hosted Gateway?
 
