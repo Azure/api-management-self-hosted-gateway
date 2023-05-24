@@ -5,6 +5,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   AZURE_TENANT_ID: 72f988bf-86f1-41af-91ab-2d7cd011db47
   AZURE_SUBSCRIPTION_ID: a200340d-6b82-494d-9dbf-687ba6e33f9e
