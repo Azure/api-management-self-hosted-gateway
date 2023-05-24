@@ -162,8 +162,8 @@ jobs:
         azcliversion: 2.30.0
         inlineScript: |
           az account show
-          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
-          AD_APP_SECRET=$(az keyvault secret show --name "Azure-Ad-App-Secret" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
+          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ vars.AZURE_KEY_VAULT_NAME }}" --query "value")
+          AD_APP_SECRET=$(az keyvault secret show --name "Azure-Ad-App-Secret" --vault-name "${{ vars.AZURE_KEY_VAULT_NAME }}" --query "value")
           echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
           echo "::add-mask::$AD_APP_SECRET"
           echo "::set-output name=adAppSecret::$AD_APP_SECRET"
