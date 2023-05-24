@@ -60,8 +60,8 @@ jobs:
         azcliversion: 2.30.0
         inlineScript: |
           az account show
-          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
-          GATEWAY_TOKEN=$(az keyvault secret show --name "Gateway-Token" --vault-name "${{ env.AZURE_KEY_VAULT_NAME }}" --query "value")
+          GATEWAY_CONFIG_URL=$(az keyvault secret show --name "Gateway-Configuration-Url" --vault-name "${{ vars.AZURE_KEY_VAULT_NAME }}" --query "value")
+          GATEWAY_TOKEN=$(az keyvault secret show --name "Gateway-Token" --vault-name "${{ vars.AZURE_KEY_VAULT_NAME }}" --query "value")
           echo "::set-output name=configurationUrl::$GATEWAY_CONFIG_URL"
           echo "::add-mask::$GATEWAY_TOKEN"
           echo "::set-output name=gatewayToken::$GATEWAY_TOKEN"
@@ -206,10 +206,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.name=${{ env.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }}  --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.name=${{ vars.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }}  --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.name=${{ env.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.name=${{ vars.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
