@@ -1,0 +1,15 @@
+{{- $doesSupportStableIngress := .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
+{{- if  and (.Values.ingress.controller.enabled) ($doesSupportStableIngress) -}}
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: {{ include "azure-api-management-gateway.fullname" . }}
+  labels:
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
+  {{- with .Values.ingress.controller.ingressClass.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  controller: {{ .Values.ingress.controller.ingressClass.controller | quote }}
+{{- end }}
