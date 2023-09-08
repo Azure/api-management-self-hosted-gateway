@@ -12,4 +12,52 @@ metadata:
   {{- end }}
 spec:
   controller: {{ .Values.ingress.controller.ingressClass.controller | quote }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "azure-api-management-gateway.fullname" . }}-rbac
+  labels:
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - namespaces
+    verbs:
+      - get
+      - watch
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - watch
+      - get
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - list
+      - watch
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "azure-api-management-gateway.fullname" . }}
+  labels:
+    {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "azure-api-management-gateway.fullname" . }}-rbac
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.serviceAccountName }}
+    namespace: {{ .Release.Namespace }}
 {{- end }}
