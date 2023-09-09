@@ -127,6 +127,7 @@ service:
   annotations: {}
 
 ingress:
+  # Experimental feature: See https://github.com/Azure/api-management-self-hosted-gateway-ingress
   controller:
     enabled: false
     namespace: ""
