@@ -132,6 +132,8 @@ ingress:
     enabled: false
     namespace: ""
     annotations: []
+    dns:
+      suffix: "svc.cluster.local"
     ingressClass:    
       controller: "azure-api-management/gateway"
       annotations: []
