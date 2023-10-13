@@ -22,6 +22,7 @@ data:
 {{- if .Values.ingress.controller.enabled }}
   k8s.ingress.enabled : {{ .Values.ingress.controller.enabled | quote }}
   k8s.ingress.namespace : {{ .Values.ingress.controller.namespace | default ( .Release.Namespace ) | quote }}
+  k8s.ingress.dns.suffix: {{ .Values.ingress.controller.dns.suffix | quote }}
 {{- end }}
   telemetry.metrics.cloud: {{ .Values.observability.azureMonitor.metrics.enabled | quote }}
   telemetry.logs.std: {{ .Values.observability.logs.std.format | quote }}

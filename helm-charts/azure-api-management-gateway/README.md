@@ -135,6 +135,11 @@ their default values.
 | `ingress.tls` | Configuration for TLS on the ingress | None |
 | `ingress.ingressClassName` | Configuration of the ingress class to be used | |
 | `ingress.useHttpsBackend` | Indication whether or not the https port of the service should be used | `false` |
+| `ingress.controller.enabled` | Indication whether or not Self-Hosted gateway should act as an Ingress controller. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `false` |
+| `ingress.controller.namespace` | Kubernetes namespace to watch. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `default` |
+| `ingress.controller.annotations` | Indication whether or not Self-Hosted gateway should act as an Ingress controller. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `[]` |
+| `ingress.controller.dns.suffix` | DNS suffix to use to build Kubernetes hostname for services inside the cluster. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `svc.cluster.local` |
+| `ingress.controller.ingressClass.annotations` | Annotationts to apply to ingress class ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `[]`|
 | `serviceAccountName` | Configuration of the serviceAccountName used | default |
 | `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `false` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |
