@@ -6,7 +6,9 @@ metadata:
   labels:
     {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 spec:
+  {{- if .Values.replicaCount }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "azure-api-management-gateway.selectorLabels" . | nindent 6 }}

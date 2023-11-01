@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# set to 'null' in case you want to remove `replicaCount` property from the deployment
 replicaCount: 3
 
 image:
