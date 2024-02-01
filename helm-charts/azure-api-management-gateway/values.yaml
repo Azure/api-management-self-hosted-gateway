@@ -164,7 +164,7 @@ resources: {}
   #   memory: 128Mi
 
 highAvailability:
-  enabled: false
+  enabled: true
   disruption:
     maximumUnavailable: 25%
   podTopologySpread:
