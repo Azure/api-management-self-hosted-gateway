@@ -141,7 +141,7 @@ their default values.
 | `ingress.controller.dns.suffix` | DNS suffix to use to build Kubernetes hostname for services inside the cluster. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `svc.cluster.local` |
 | `ingress.controller.ingressClass.annotations` | Annotationts to apply to ingress class ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `[]`|
 | `serviceAccountName` | Configuration of the serviceAccountName used | default |
-| `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `false` |
+| `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `true` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |
 | `highAvailability.podTopologySpread.whenUnsatisfiable` | Indication how pods should be spread across nodes in case the requirement cannot be met. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/) | `ScheduleAnyway` |
 | `security.tls.server.ciphers.allowedSuites` | A comma-separated list of ciphers to use for the TLS connection between the API client and the self-hosted gateway. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). | Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites). |
@@ -164,11 +164,11 @@ helm install azure-apim-gateway/azure-api-management-gateway --name azure-api-ma
 
 ## High Availability
 
-We allow you to opt-in to deploy the self-hosted gateway to optimize the workload for high availability by using `highAvailability.enabled=true`.
+We deploy the self-hosted gateway highly available by default to optimize for resilience to reduce impact on your platform, but you can opt-out by using `highAvailability.enabled=false`.
 
 This will ensure that:
 
 - **Distributing Pods Across Nodes** - Instances will be spread across nodes in the cluster that are in different availability zones
   - However, this will only work if your cluster is using availability zones. For Azure Kubernetes Service, learn more [here](https://docs.microsoft.com/en-us/azure/aks/availability-zones).
-  - For Kubernetes v1.19+, learn more about [pod topology spread constraints](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/).
-- **Prevent Against Volutary Disruptions** - Only a % of instances can be removed due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions) (ie. node drain, deployment upgrade, pod delete, etc.)
+  - Learn more about [pod topology spread constraints](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/).
+- **Prevent Against Voluntary Disruptions** - Only a % of instances can be removed due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions) (ie. node drain, deployment upgrade, pod delete, etc.)
