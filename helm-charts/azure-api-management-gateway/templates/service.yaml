@@ -10,8 +10,13 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.service.type }}
+{{- if eq .Values.service.type "LoadBalancer" }}
 {{- if (.Values.service.loadBalancer).ip }}
   loadBalancerIP: {{ .Values.service.loadBalancer.ip }}
+{{- end }}
+{{- if eq .Values.service.allocateLoadBalancerNodePorts false }}
+  allocateLoadBalancerNodePorts: false
+{{- end }}
 {{- end }}
   ports:
     - port: {{ .Values.service.ports.http }}
