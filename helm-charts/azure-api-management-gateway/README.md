@@ -120,7 +120,7 @@ their default values.
 | `service.type` | Type of Kubernetes service to use to expose to serve traffic | `ClusterIP` |
 | `service.annotations` | Annotations to add to the Kubernetes service | `{}` |
 | `service.loadBalancer.ip` | Attach a pre-existing static IP to a `LoadBalancer` type service. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer). | |
-| `service.allocateLoadBalancerNodePorts` | Defines if NodePorts will be automatically allocated for services with type LoadBalancer | `true` |
+| `service.loadBalancer.allocateNodePorts` | Defines if node ports will be automatically allocated for services with type `LoadBalancer` | `true` |
 | `service.ports.http` | Port for HTTP traffic on service for other pods to talk to | `8080` |
 | `service.ports.https` | Port for HTTPs traffic on service for other pods to talk to | `8081` |
 | `service.ports.instance.synchronization` | Port used for internal discovery of gateway instances to synchronize across all of them, ie for rate limiting. | `4290` |
