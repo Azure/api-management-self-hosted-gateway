@@ -119,6 +119,8 @@ dapr:
 
 service:
   type: ClusterIP
+  loadBalancer:
+    allocateNodePorts: true
   ports:
     http: 8080
     https: 8081
