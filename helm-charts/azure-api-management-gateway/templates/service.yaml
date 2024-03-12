@@ -14,7 +14,7 @@ spec:
 {{- if (.Values.service.loadBalancer).ip }}
   loadBalancerIP: {{ .Values.service.loadBalancer.ip }}
 {{- end }}
-{{- if eq .Values.service.allocateLoadBalancerNodePorts false }}
+{{- if eq .Values.service.loadBalancer.allocateNodePorts false }}
   allocateLoadBalancerNodePorts: false
 {{- end }}
 {{- end }}
