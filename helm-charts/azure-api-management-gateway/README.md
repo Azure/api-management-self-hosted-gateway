@@ -150,6 +150,7 @@ their default values.
 | `resources` | Pod resource requests & limits | `{}` |
 | `probes.readiness` | Configuration for readiness probes of the container | Uses `/status-0123456789abcdef` as endpoint for HTTP probes |
 | `probes.liveness` | Configuration for liveness probes of the container | Uses `/status-0123456789abcdef` as endpoint for HTTP probes |
+| `probes.startup` | Configuration for startup probes of the container | Uses `/status-0123456789abcdef` as endpoint for HTTP probes |
 | `securityContext` | Privilege and access control settings for the  container | `{}` |
 | `podSecurityContext` | Privilege and access control settings for the  pod | `{}` |
 

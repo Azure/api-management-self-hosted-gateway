@@ -152,6 +152,10 @@ probes:
     httpGet:
       path: /status-0123456789abcdef
       port: http
+  startup:
+    httpGet:
+      path: /status-0123456789abcdef
+      port: http
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
