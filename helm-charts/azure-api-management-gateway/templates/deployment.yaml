@@ -133,10 +133,17 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.gateway.configuration.backup.enabled }}
+          {{- if or (.Values.gateway.configuration.backup.enabled) (eq (lower .Values.observability.logs.local.type) "localsyslog") }}
           volumeMounts:
+          {{- if .Values.gateway.configuration.backup.enabled }}
             - mountPath: /apim/config
               name: {{ include "azure-api-management-gateway.fullname" . }}
+          {{- end }}
+          {{- if eq (lower .Values.observability.logs.local.type) "localsyslog" }}
+            {{- $localsyslogEndpoint := .Values.observability.logs.local.localsyslog.endpoint | required "No endpoint for localsyslog was specified in observability.logs.local.localsyslog.endpoint." }}
+            - mountPath: {{ $localsyslogEndpoint }}
+              name: logs
+          {{- end }}
           {{- end }}
       {{- with .Values.podSecurityContext }}
       securityContext:
@@ -163,8 +170,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      {{- if .Values.gateway.configuration.backup.enabled }}
+      {{- if or (eq (lower .Values.observability.logs.local.type) "localsyslog") (.Values.gateway.configuration.backup.enabled) }}
       volumes:
+        {{- if .Values.gateway.configuration.backup.enabled }}
         - name: {{ include "azure-api-management-gateway.fullname" . }}
           persistentVolumeClaim:
               {{ if .Values.gateway.configuration.backup.persistentVolumeClaim.create -}}
@@ -172,4 +180,11 @@ spec:
               {{ else -}}
               claimName: {{ .Values.gateway.configuration.backup.persistentVolumeClaim.existingName }}
               {{- end }}
+        {{- end }}
+        {{- if eq (lower .Values.observability.logs.local.type) "localsyslog" }}
+        - hostPath:
+            path: /dev/log
+            type: Socket
+          name: logs
+        {{- end }}
       {{- end }}
