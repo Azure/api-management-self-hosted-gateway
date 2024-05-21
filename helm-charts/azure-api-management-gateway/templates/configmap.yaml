@@ -28,7 +28,7 @@ data:
   telemetry.logs.std: {{ .Values.observability.logs.std.format | quote }}
   telemetry.logs.std.level: {{ .Values.observability.logs.std.level | quote }}
   telemetry.logs.std.color:  {{ .Values.observability.logs.std.useColor | quote }}
-  telemetry.logs.local: {{ .Values.observability.logs.local.type | quote }}
+  telemetry.logs.local: {{ .Values.observability.logs.local.type | lower | quote }}
 {{- if .Values.observability.logs.local.localsyslog.endpoint }}
   telemetry.logs.local.localsyslog.endpoint: {{ .Values.observability.logs.local.localsyslog.endpoint | quote }}
 {{- end }}
