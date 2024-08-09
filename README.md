@@ -35,6 +35,10 @@ To learn more, we recommend inspecting the Helm chart:
 helm inspect all azure-apim-gateway/azure-api-management-gateway
 ```
 
+## Community presentations and demonstrations
+
+Introduction and demonstration with AKS by Houssem Dellai: https://youtu.be/JsZ1iNx5iOU.
+
 ## License
 
 Azure API Management Self-Hosted Gateway license is available [here](gateway-license.md). This repo is licensed under a different license that can be viewed [here](LICENSE).
