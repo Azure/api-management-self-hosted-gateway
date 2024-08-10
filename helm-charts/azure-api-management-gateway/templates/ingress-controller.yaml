@@ -4,6 +4,7 @@ apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
   name: {{ include "azure-api-management-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
   {{- with .Values.ingress.controller.ingressClass.annotations }}
