@@ -3,6 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "azure-api-management-gateway.fullname" . }}
+  namespace : {{ .Release.Namespace | quote }}
   labels:
     {{- include "azure-api-management-gateway.labels" . | nindent 4 }}
 spec:

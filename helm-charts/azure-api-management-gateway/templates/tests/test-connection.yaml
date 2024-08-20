@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: "{{ include "azure-api-management-gateway.fullname" . }}-test-connection"
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app.kubernetes.io/name: {{ include "azure-api-management-gateway.name" . }}
     helm.sh/chart: {{ include "azure-api-management-gateway.chart" . }}
