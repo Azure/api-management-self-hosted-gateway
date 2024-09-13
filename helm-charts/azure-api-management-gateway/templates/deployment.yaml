@@ -20,7 +20,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "azure-api-management-gateway.selectorLabels" . | nindent 8 }}
+        {{- include "azure-api-management-gateway.labels" . | nindent 8 }}
       {{- if or .Values.dapr.enabled .Values.gateway.deployment.annotations }}
       annotations:
         {{- if .Values.gateway.deployment.annotations -}}
