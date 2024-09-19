@@ -150,6 +150,9 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
 {{- if .Values.highAvailability.enabled }}
       topologySpreadConstraints:
       - maxSkew: 1
