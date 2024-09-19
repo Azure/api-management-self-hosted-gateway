@@ -153,6 +153,7 @@ their default values.
 | `probes.startup` | Configuration for startup probes of the container | Uses `/status-0123456789abcdef` as endpoint for HTTP probes |
 | `securityContext` | Privilege and access control settings for the  container | `{}` |
 | `podSecurityContext` | Privilege and access control settings for the  pod | `{}` |
+| `priorityClassName` | Priority class name for the pod e.g. `priority` | |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to
 `helm install`.
