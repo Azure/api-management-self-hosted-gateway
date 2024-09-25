@@ -198,3 +198,6 @@ podSecurityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1001       # This is a built-in user, but you can use any user ie 1000 as well
   # runAsGroup: 2000      # This is just an example
+
+commonLabels: {}
+  # Labels to add to all deployed objects

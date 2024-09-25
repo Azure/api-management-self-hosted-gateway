@@ -39,6 +39,11 @@ helm.sh/chart: {{ include "azure-api-management-gateway.chart" . }}
 {{ include "azure-api-management-gateway.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if not (empty .Values.commonLabels) }}
+{{- range $key, $value := .Values.commonLabels }}
+{{ $key }}: {{ $value }}
+{{- end }}   
+{{- end }}
 {{- end }}
 {{/*
     Selector labels
