@@ -154,7 +154,8 @@ their default values.
 | `securityContext` | Privilege and access control settings for the  container | `{}` |
 | `podSecurityContext` | Privilege and access control settings for the  pod | `{}` |
 | `commonLabels` | Custom labels to add to all deployed objects | `{}` |
- 
+| `priorityClassName` | Priority class name for the pod e.g. `priority` | |
+
 Specify each parameter using the `--set key=value[,key=value]` argument to
 `helm install`.
 
