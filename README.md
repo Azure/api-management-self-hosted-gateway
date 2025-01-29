@@ -35,6 +35,12 @@ To learn more, we recommend inspecting the Helm chart:
 helm inspect all azure-apim-gateway/azure-api-management-gateway
 ```
 
+## Getting Help & Support
+
+This repository is used to maintain the Azure API Management Self-Hosted Gateway's Helm chart and announce releases for our gateway and Helm chart.
+
+We do not offer support through GitHub. In case you need help, please open an Azure Support ticket.
+
 ## Community presentations and demonstrations
 
 Introduction and demonstration with AKS by Houssem Dellai: https://youtu.be/JsZ1iNx5iOU.
