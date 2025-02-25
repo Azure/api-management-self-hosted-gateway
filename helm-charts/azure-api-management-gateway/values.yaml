@@ -156,6 +156,7 @@ probes:
     httpGet:
       path: /status-0123456789abcdef
       port: http
+    failureThreshold: 10
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
