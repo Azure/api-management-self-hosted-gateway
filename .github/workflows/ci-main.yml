@@ -21,18 +21,18 @@ jobs:
       fail-fast: false
       matrix:
         enableHighAvailability: [false, true]
-        kubernetesVersion: [v1.32, v1.31, v1.30, v1.29]
+        kubernetesVersion: [v1.34, v1.33, v1.32, v1.31]
         include:
           # Images are defined on every Kind release
           # See https://github.com/kubernetes-sigs/kind/releases for an overview of the images
+        - kubernetesVersion: v1.34
+          kindImage: kindest/node:v1.34.0@sha256:7416a61b42b1662ca6ca89f02028ac133a309a2a30ba309614e8ec94d976dc5a
+        - kubernetesVersion: v1.33
+          kindImage: kindest/node:v1.33.4@sha256:25a6018e48dfcaee478f4a59af81157a437f15e6e140bf103f85a2e7cd0cbbf2
         - kubernetesVersion: v1.32
-          kindImage: kindest/node:v1.32.2@sha256:f226345927d7e348497136874b6d207e0b32cc52154ad8323129352923a3142f
+          kindImage: kindest/node:v1.32.8@sha256:abd489f042d2b644e2d033f5c2d900bc707798d075e8186cb65e3f1367a9d5a1
         - kubernetesVersion: v1.31
-          kindImage: kindest/node:v1.31.6@sha256:28b7cbb993dfe093c76641a0c95807637213c9109b761f1d422c2400e22b8e87
-        - kubernetesVersion: v1.30
-          kindImage: kindest/node:v1.30.10@sha256:4de75d0e82481ea846c0ed1de86328d821c1e6a6a91ac37bf804e5313670e507
-        - kubernetesVersion: v1.29
-          kindImage: kindest/node:v1.29.14@sha256:8703bd94ee24e51b778d5556ae310c6c0fa67d761fae6379c8e0bb480e6fea29
+          kindImage: kindest/node:v1.31.12@sha256:0f5cc49c5e73c0c2bb6e2df56e7df189240d83cf94edfa30946482eb08ec57d2
     name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
