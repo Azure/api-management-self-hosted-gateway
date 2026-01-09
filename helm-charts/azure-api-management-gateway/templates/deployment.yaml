@@ -21,6 +21,9 @@ spec:
     metadata:
       labels:
         {{- include "azure-api-management-gateway.labels" . | nindent 8 }}
+      {{- if eq (lower $authenticationType) "workloadidentity" }}
+        azure.workload.identity/use: "true"
+      {{- end }}
       {{- if or .Values.dapr.enabled .Values.gateway.deployment.annotations }}
       annotations:
         {{- if .Values.gateway.deployment.annotations -}}

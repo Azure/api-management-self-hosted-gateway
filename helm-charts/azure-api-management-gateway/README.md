@@ -46,6 +46,30 @@ helm repo update
 
 To install the chart with the release name `azure-api-management-gateway`:
 
+**Entra ID (Workload Identity):**
+
+```console
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
+             --set gateway.name=='<gateway-name>' \
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.type='WorkloadIdentity' \
+             --set gateway.auth.azureAd.app.id='<entra-id-app-id>'
+```
+
+**Entra ID (Client Secret/Certificate):**
+
+```console
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
+             --set gateway.name=='<gateway-name>' \
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.type='AzureAdApp' \
+             --set gateway.auth.azureAd.tenant.id='<entra-id-tenant-id>' \
+             --set gateway.auth.azureAd.app.id='<entra-id-app-id>'
+             --set config.service.auth.azureAd.clientSecret='<entra-id-secret>' \
+```
+
+**Gateway token authentication:**
+
 ```console
 helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
              --set gateway.configuration.uri='<gateway-url>' \
@@ -90,10 +114,10 @@ their default values.
 | `gateway.configuration.backup.persistentVolumeClaim.accessMode` | Access mode for the Persistent Volume Claim (PVC) pod | `ReadWriteMany` |
 | `gateway.configuration.backup.persistentVolumeClaim.size` | Size of the Persistent Volume Claim (PVC) to be created | `50Mi` |
 | `gateway.configuration.additional` | Capability to specify a list of settings to add which are not supported by the Helm chart yet. | `{}` |
-| `gateway.auth.type` | Type of authentication to use for Azure API Management's Configuration API. Options are `GatewayToken` or `AzureAdApp`. | `GatewayToken` |
+| `gateway.auth.type` | Type of authentication to use for Azure API Management's Configuration API. Options are `GatewayToken`, `WorkloadIdentity` or `AzureAdApp`. | `GatewayToken` |
 | `gateway.auth.key` | Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey` | |
 | `gateway.auth.azureAd.tenant.id` | ID of the Azure AD tenant. Required when authentication type is `AzureAdApp` | |
-| `gateway.auth.azureAd.app.id` | Client ID of the Azure AD app to authenticate with (also known as application ID). Required when authentication type is `AzureAdApp` | |
+| `gateway.auth.azureAd.app.id` | Client ID of the Azure AD app to authenticate with (also known as application ID). Required when authentication type is `WorkloadIdentity` or `AzureAdApp` | |
 | `gateway.auth.azureAd.app.secret` | Secret of the Azure AD app to authenticate with. Required when authentication type is `AzureAdApp` | |
 | `gateway.auth.azureAd.authority` | Authority URL of Azure AD. | |	
 | `gateway.deployment.dns.hostAliases` | Add custom host aliases (configuration endpoint e.g.) Check the [values.yaml](./values.yaml) for the details. |  `{}` |
@@ -144,7 +168,7 @@ their default values.
 | `serviceAccountName` | **Deprecated - Use `serviceAccount.name` instead.** Legacy field for specifying an existing service account. By default, a service account is now auto-generated with release name (see `serviceAccount.create`) | `""` |
 | `serviceAccount.create` | Specifies whether a service account should be created. When true, a service account is automatically generated with the deployment name | `true` |
 | `serviceAccount.name` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. If not set and `create` is false, falls back to `serviceAccountName` value | `""` |
-| `serviceAccount.annotations` | Annotations to add to the service account | `{}` |
+| `serviceAccount.annotations` | Annotations to add to the service account. Required when using WorkloadIdentity authentication | `{}` |
 | `serviceAccount.labels` | Labels to add to the service account | `{}` |
 | `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `true` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |
