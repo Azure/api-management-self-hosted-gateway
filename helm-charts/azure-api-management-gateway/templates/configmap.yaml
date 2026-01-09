@@ -21,7 +21,6 @@ data:
   {{- end }}
 {{- end }}
 {{- if eq (lower $authenticationType) "workloadidentity" }}
-  {{- $adAppid := .Values.gateway.auth.azureAd.app.id | required "No Azure AD application ID was specified in gateway.auth.azureAd.app.id." }}
   {{- $gatewayName := .Values.gateway.name | required "No gateway name was specified in gateway.name." }}
   gateway.name : {{ $gatewayName | quote }}
   config.service.auth: "workloadIdentity"
