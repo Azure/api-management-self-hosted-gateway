@@ -59,18 +59,6 @@ When you submit a pull request, a CLA bot will automatically determine whether y
 a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
 provided by the bot. You will only need to do this once across all repos using our CLA.
 
-### Updating Helm Chart Documentation
-
-The Helm chart documentation in `helm-charts/azure-api-management-gateway/README.md` is automatically generated using [helm-docs](https://github.com/norwoodj/helm-docs).
-
-To update the documentation:
-1. Install helm-docs: Follow the [installation instructions](https://github.com/norwoodj/helm-docs#installation)
-2. Update the comments in `values.yaml` using the `# --` format for descriptions
-3. Run `helm-docs` in the `helm-charts/azure-api-management-gateway` directory
-4. Commit both `values.yaml` and the generated `README.md`
-
-The CI workflow will validate that the README is up-to-date with the values.yaml file.
-
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
