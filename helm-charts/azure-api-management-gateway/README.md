@@ -141,7 +141,11 @@ their default values.
 | `ingress.controller.annotations` | Indication whether or not Self-Hosted gateway should act as an Ingress controller. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `[]` |
 | `ingress.controller.dns.suffix` | DNS suffix to use to build Kubernetes hostname for services inside the cluster. ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `svc.cluster.local` |
 | `ingress.controller.ingressClass.annotations` | Annotationts to apply to ingress class ([experimental feature])(https://github.com/Azure/api-management-self-hosted-gateway-ingress) | `[]`|
-| `serviceAccountName` | Configuration of the serviceAccountName used | default |
+| `serviceAccountName` | **Deprecated - Use `serviceAccount.name` instead.** Legacy field for specifying an existing service account. By default, a service account is now auto-generated with release name (see `serviceAccount.create`) | `""` |
+| `serviceAccount.create` | Specifies whether a service account should be created. When true, a service account is automatically generated with the deployment name | `true` |
+| `serviceAccount.name` | The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. If not set and `create` is false, falls back to `serviceAccountName` value | `""` |
+| `serviceAccount.annotations` | Annotations to add to the service account | `{}` |
+| `serviceAccount.labels` | Labels to add to the service account | `{}` |
 | `highAvailability.enabled` | Indication whether or not the gateway should be scheduled highly available in the cluster. | `true` |
 | `highAvailability.disruption.maximumUnavailable` | Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions). | `25%` |
 | `highAvailability.podTopologySpread.whenUnsatisfiable` | Indication how pods should be spread across nodes in case the requirement cannot be met. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/) | `ScheduleAnyway` |
