@@ -92,7 +92,9 @@ observability:
     histogram:
       # Specify custom bucket sizes using ',' seperator.
       # Example: '10,20'
-      buckets: 
+      buckets:
+    system-metrics:
+      enabled: false 
   statsD:
     enabled: false
     endpoint: 
