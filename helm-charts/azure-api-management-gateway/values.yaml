@@ -94,7 +94,7 @@ observability:
       # Example: '10,20'
       buckets:
     system-metrics:
-      enabled: false 
+      enabled: false
   statsD:
     enabled: false
     endpoint: 
