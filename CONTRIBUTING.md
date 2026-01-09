@@ -38,8 +38,18 @@ When releasing a new version of the Helm chart, follow these steps:
    - Run `helm-docs` in the `helm-charts/azure-api-management-gateway` directory to regenerate the README
    - Verify the generated `README.md` is accurate and complete
 
-3. **Commit Changes**: Commit both the `Chart.yaml`, `values.yaml`, and generated `README.md` files
+3. **Package and Index the Chart**: Navigate to the `helm-charts` directory and run:
+   ```bash
+   cd helm-charts
+   helm package azure-api-management-gateway
+   helm repo index . --url https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+   ```
 
-4. **Create Release**: Follow the standard release process for the repository
+4. **Commit and Push Changes**: 
+   ```bash
+   git add .
+   git commit -m "Release Helm chart version X.Y.Z"
+   git push origin main
+   ```
 
 5. **Verify CI**: Ensure the `validate-helm-docs` job in the CI workflow passes, confirming documentation is synchronized
