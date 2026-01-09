@@ -66,7 +66,7 @@ data:
   observability.opentelemetry.histogram.buckets: {{ .Values.observability.opentelemetry.histogram.buckets | quote }}
   {{ end }}
 {{- end }}
-  observability.opentelemetry.system-metrics.enabled: {{ index .Values.observability.opentelemetry "system-metrics" "enabled" | quote }}
+  observability.opentelemetry.system-metrics.enabled: {{ .Values.observability.opentelemetry.systemMetrics.enabled | quote }}
 {{- if .Values.security.tls.server.ciphers.allowedSuites }}
   net.server.tls.ciphers.allowed-suites: {{ .Values.security.tls.server.ciphers.allowedSuites | quote }}
 {{- end }}

@@ -93,7 +93,7 @@ observability:
       # Specify custom bucket sizes using ',' seperator.
       # Example: '10,20'
       buckets:
-    system-metrics:
+    systemMetrics:
       enabled: false
   statsD:
     enabled: false
