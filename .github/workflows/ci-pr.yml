@@ -23,7 +23,7 @@ jobs:
 
     - name: Install helm-docs
       run: |
-        curl -fsSL https://github.com/norwoodj/helm-docs/releases/latest/download/helm-docs_${{ env.HELM_DOCS_VERSION }}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
+        curl -fsSL https://github.com/norwoodj/helm-docs/releases/download/v${{ env.HELM_DOCS_VERSION }}/helm-docs_${{ env.HELM_DOCS_VERSION }}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
         tar -xzf helm-docs.tar.gz
         chmod +x helm-docs
         sudo mv helm-docs /usr/local/bin/
