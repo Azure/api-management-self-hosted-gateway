@@ -9,6 +9,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  HELM_DOCS_VERSION: "1.14.2"
+
 jobs:
   validate-helm-docs:
     runs-on: ubuntu-latest
@@ -20,7 +23,7 @@ jobs:
 
     - name: Install helm-docs
       run: |
-        curl -fsSL https://github.com/norwoodj/helm-docs/releases/latest/download/helm-docs_1.14.2_Linux_x86_64.tar.gz -o helm-docs.tar.gz
+        curl -fsSL https://github.com/norwoodj/helm-docs/releases/latest/download/helm-docs_${{ env.HELM_DOCS_VERSION }}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
         tar -xzf helm-docs.tar.gz
         chmod +x helm-docs
         sudo mv helm-docs /usr/local/bin/
