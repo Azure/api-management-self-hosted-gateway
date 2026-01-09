@@ -1,0 +1,94 @@
+{{ template "chart.header" . }}
+
+[Self-hosted Azure API Management gateway](https://docs.microsoft.com/en-us/azure/api-management/self-hosted-gateway-overview) allows you to run Azure API Management gateway anywhere - Any cloud, hybrid or on-premises.
+
+## TL;DR
+
+We are using Helm v3.
+
+```console
+helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+helm repo update
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.key='<gateway-key>'
+```
+
+## Introduction
+
+This chart bootstraps an **Azure API Management gateway** deployment on a Kubernetes cluster using the [Helm](https://helm.sh/) package manager.
+
+## Prerequisites
+
+- Azure Subscription
+- Azure API Management instance
+  - A provisioned [self-hosted gateway](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-provision-self-hosted-gateway) resource.
+  - Endpoint & authentication information required for deployment. See the `Deployment` section of the created gateway resource in Azure Portal.
+- [Helm 3](https://helm.sh/docs/intro/install/)
+
+## Usage
+
+### Add the Repo
+
+To add the chart repository:
+
+```console
+helm repo add azure-apim-gateway https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+```
+
+Update your Helm chart repos:
+
+```console
+helm repo update
+```
+
+### Installing the Chart
+
+To install the chart with the release name `azure-api-management-gateway`:
+
+```console
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.key='<gateway-key>'
+```
+
+The command deploys the [Azure API Management gateway](https://docs.microsoft.com/en-us/azure/api-management/self-hosted-gateway-overview) on the Kubernetes cluster.
+
+### Uninstall the Chart
+
+To uninstall the `azure-api-management-gateway` deployment:
+
+```console
+helm delete azure-api-management-gateway
+```
+
+The command removes all the Kubernetes components associated with the chart and
+deletes the release.
+
+## Configuration
+
+The following table lists the configurable parameters of the self-hosted Azure API Management gateway chart and
+their default values.
+
+{{ template "chart.valuesTable" . }}
+
+Specify each parameter using the `--set key=value[,key=value]` argument to
+`helm install`.
+
+Alternatively, a YAML file that specifies the values for the above parameters can
+be provided while installing the chart. For example,
+
+```console
+helm install azure-apim-gateway/azure-api-management-gateway --name azure-api-management-gateway -f values.yaml
+```
+
+## High Availability
+
+We deploy the self-hosted gateway highly available by default to optimize for resilience to reduce impact on your platform, but you can opt-out by using `highAvailability.enabled=false`.
+
+This will ensure that:
+
+- **Distributing Pods Across Nodes** - Instances will be spread across nodes in the cluster that are in different availability zones
+  - However, this will only work if your cluster is using availability zones. For Azure Kubernetes Service, learn more [here](https://docs.microsoft.com/en-us/azure/aks/availability-zones).
+  - Learn more about [pod topology spread constraints](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/).
+- **Prevent Against Voluntary Disruptions** - Only a % of instances can be removed due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions) (ie. node drain, deployment upgrade, pod delete, etc.)
