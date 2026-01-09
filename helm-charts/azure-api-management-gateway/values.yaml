@@ -141,7 +141,13 @@ ingress:
       controller: "azure-api-management/gateway"
       annotations: []
 
-serviceAccountName: default
+serviceAccountName: "" # Deprecated, use serviceAccount.name instead
+
+serviceAccount:
+  name: ""
+  create: true
+  annotations: {}
+  labels: {}
 
 probes:
   readiness:

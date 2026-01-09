@@ -59,6 +59,6 @@ roleRef:
   name: {{ include "azure-api-management-gateway.fullname" . }}-rbac
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.serviceAccountName }}
+    name: {{ include "azure-api-management-gateway.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 {{- end }}

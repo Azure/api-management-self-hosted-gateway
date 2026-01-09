@@ -67,3 +67,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "azure-api-management-gateway.instanceDiscoveryService" -}}
 {{ include "azure-api-management-gateway.fullname" . | trunc 44 | trimSuffix "-" }}-instance-discovery
 {{- end -}}
+
+{{/*
+    Create the name of the service account to use
+*/}}
+{{- define "azure-api-management-gateway.serviceAccountName" -}}
+{{- if .Values.serviceAccount.name -}}
+{{- .Values.serviceAccount.name -}}
+{{- else if .Values.serviceAccountName -}}
+{{- .Values.serviceAccountName -}}
+{{- else -}}
+{{- include "azure-api-management-gateway.fullname" . -}}
+{{- end -}}
+{{- end -}}
