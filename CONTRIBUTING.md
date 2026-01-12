@@ -16,7 +16,19 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 The Helm chart documentation in `helm-charts/azure-api-management-gateway/README.md` is automatically generated using [helm-docs](https://github.com/norwoodj/helm-docs).
 
-### How to Update Documentation
+### Pre-commit Hook (Recommended)
+
+To ensure documentation is always up-to-date, we recommend setting up the pre-commit hook:
+
+1. Install pre-commit: `pip install pre-commit` or follow the [installation instructions](https://pre-commit.com/#install)
+2. Install the git hook scripts: `pre-commit install`
+3. (Optional) Run against all files: `pre-commit run --all-files`
+
+Once configured, the pre-commit hook will automatically regenerate the README whenever you commit changes to `values.yaml`, `Chart.yaml`, or `README.md.gotmpl`.
+
+### Manual Documentation Update
+
+If you prefer to update documentation manually:
 
 1. Install helm-docs: Follow the [installation instructions](https://github.com/norwoodj/helm-docs#installation)
 2. Update the comments in `values.yaml` using the `# --` format for descriptions
