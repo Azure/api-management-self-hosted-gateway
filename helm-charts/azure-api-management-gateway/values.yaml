@@ -132,8 +132,7 @@ observability:
       # -- Uri of the OpenTelemetry Collector to push metrics to. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       uri: 
     histogram:
-      # Specify custom bucket sizes using ',' seperator.
-      # Example: '10,20'
+      # -- Define custom bucket sizes for all histograms in OpenTelemetry metrics. Format must be `,` separated (e.g., '10,20'). Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       buckets:
     systemMetrics:
       # -- Indication whether or not system metrics should be collected by OpenTelemetry.

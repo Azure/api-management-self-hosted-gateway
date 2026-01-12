@@ -1,4 +1,4 @@
-# azure-api-management-gateway
+# Azure API Management Gateway
 
 <!-- This README is auto-generated using helm-docs. To update, run: helm-docs -->
 
