@@ -48,6 +48,30 @@ helm repo update
 
 To install the chart with the release name `azure-api-management-gateway`:
 
+**Entra ID (Workload Identity):**
+
+```console
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
+             --set gateway.name=='<gateway-name>' \
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.type='WorkloadIdentity' \
+             --set gateway.auth.azureAd.app.id='<entra-id-app-id>'
+```
+
+**Entra ID (Client Secret/Certificate):**
+
+```console
+helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
+             --set gateway.name=='<gateway-name>' \
+             --set gateway.configuration.uri='<gateway-url>' \
+             --set gateway.auth.type='AzureAdApp' \
+             --set gateway.auth.azureAd.tenant.id='<entra-id-tenant-id>' \
+             --set gateway.auth.azureAd.app.id='<entra-id-app-id>'
+             --set config.service.auth.azureAd.clientSecret='<entra-id-secret>' \
+```
+
+**Gateway token authentication:**
+
 ```console
 helm install --name azure-api-management-gateway azure-apim-gateway/azure-api-management-gateway \
              --set gateway.configuration.uri='<gateway-url>' \
