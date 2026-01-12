@@ -140,6 +140,14 @@ gateway:
 
 The following sections list the configurable parameters of the self-hosted Azure API Management gateway chart organized by category.
 
+- [Gateway Configuration](#gateway-configuration)
+- [High Availability](#high-availability)
+- [Observability](#observability)
+- [Security](#security)
+- [Networking](#networking)
+- [Dapr](#dapr)
+- [Advanced Configuration](#advanced-configuration)
+
 ### Gateway Configuration
 
 Connection and authentication settings for the Azure API Management gateway.
@@ -154,7 +162,7 @@ Connection and authentication settings for the Azure API Management gateway.
 
 ### High Availability
 
-Deployment resilience settings.
+Settings for deployment resilience.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -200,6 +208,18 @@ Service and ingress configuration.
   {{- end }}
 {{- end }}
 
+### Dapr
+
+Configuration for Dapr integration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "dapr." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
 ### Advanced Configuration
 
 Additional deployment, pod, and resource settings.
@@ -207,7 +227,7 @@ Additional deployment, pod, and resource settings.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 {{- range .Values }}
-  {{- if not (or (hasPrefix "gateway." .Key) (hasPrefix "highAvailability." .Key) (hasPrefix "observability." .Key) (hasPrefix "security." .Key) (hasPrefix "service." .Key) (hasPrefix "ingress." .Key)) }}
+  {{- if not (or (hasPrefix "gateway." .Key) (hasPrefix "highAvailability." .Key) (hasPrefix "observability." .Key) (hasPrefix "security." .Key) (hasPrefix "service." .Key) (hasPrefix "ingress." .Key) (hasPrefix "dapr." .Key)) }}
 | `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
   {{- end }}
 {{- end }}

@@ -140,6 +140,14 @@ gateway:
 
 The following sections list the configurable parameters of the self-hosted Azure API Management gateway chart organized by category.
 
+- [Gateway Configuration](#gateway-configuration)
+- [High Availability](#high-availability)
+- [Observability](#observability)
+- [Security](#security)
+- [Networking](#networking)
+- [Dapr](#dapr)
+- [Advanced Configuration](#advanced-configuration)
+
 ### Gateway Configuration
 
 Connection and authentication settings for the Azure API Management gateway.
@@ -170,7 +178,7 @@ Connection and authentication settings for the Azure API Management gateway.
 
 ### High Availability
 
-Deployment resilience settings.
+Settings for deployment resilience.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -233,6 +241,18 @@ Service and ingress configuration.
 | `service.ports.instance.synchronization` | int | `4290` | Port used for internal discovery of gateway instances to synchronize across all of them, ie for rate limiting. |
 | `service.type` | string | `"ClusterIP"` | Type of Kubernetes service to use to expose to serve traffic. |
 
+### Dapr
+
+Configuration for Dapr integration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `dapr.app.id` | string | `nil` | Application ID to use for Dapr integration. |
+| `dapr.config` | string | `"tracing"` | Defines which Configuration CRD Dapr should use. |
+| `dapr.enabled` | bool | `false` | Indication whether or not Dapr integration should be used. |
+| `dapr.logging.level` | string | `"info"` | Level of log verbosity of Dapr sidecar. |
+| `dapr.logging.useJsonOutput` | bool | `true` | Indication whether or not logging should be in JSON format. |
+
 ### Advanced Configuration
 
 Additional deployment, pod, and resource settings.
@@ -241,11 +261,6 @@ Additional deployment, pod, and resource settings.
 |-----------|------|---------|-------------|
 | `affinity` | object | `{}` | Affinity for pod assignment. |
 | `commonLabels` | object | `{}` | Custom labels to add to all deployed objects. |
-| `dapr.app.id` | string | `nil` | Application ID to use for Dapr integration. |
-| `dapr.config` | string | `"tracing"` | Defines which Configuration CRD Dapr should use. |
-| `dapr.enabled` | bool | `false` | Indication whether or not Dapr integration should be used. |
-| `dapr.logging.level` | string | `"info"` | Level of log verbosity of Dapr sidecar. |
-| `dapr.logging.useJsonOutput` | bool | `true` | Indication whether or not logging should be in JSON format. |
 | `fullnameOverride` | string | `""` | Override the full name of the release. |
 | `image.pullPolicy` | string | `"IfNotPresent"` | Policy to pull image. |
 | `image.repository` | string | `"mcr.microsoft.com/azure-api-management/gateway"` | Repository which provides the image. |
