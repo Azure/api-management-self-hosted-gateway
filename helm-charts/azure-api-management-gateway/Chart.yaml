@@ -20,11 +20,6 @@ maintainers:
     url: https://github.com/tomkerkhove
 icon: https://github.com/Azure/API-Management/raw/main/media/apim-logo.png
 keywords:
-  - api-management
-  - api-gateway
-  - self-hosted-gateway
-  - azure
-  - ingress
   - Microsoft Azure
   - Azure
   - APIs
