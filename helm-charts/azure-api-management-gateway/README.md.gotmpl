@@ -1,6 +1,6 @@
 # Azure API Management Gateway
 
-![Version: {{ .Version }}](https://img.shields.io/badge/Version-{{ .Version | replace "-" "--" }}-informational?style=flat-square) ![AppVersion: {{ .AppVersion }}](https://img.shields.io/badge/AppVersion-{{ .AppVersion | replace "-" "--" }}-informational?style=flat-square) ![Kubernetes: >=v1.20.0-0](https://img.shields.io/badge/Kubernetes-%3E%3Dv1.20.0--0-informational?style=flat-square) ![Helm: v3](https://img.shields.io/badge/Helm-v3-informational?style=flat-square)
+![Version: {{ .Version }}](https://img.shields.io/badge/Version-{{ .Version | replace "-" "--" }}-informational?style=flat-square) ![AppVersion: {{ .AppVersion }}](https://img.shields.io/badge/AppVersion-{{ .AppVersion | replace "-" "--" }}-informational?style=flat-square)
 
 {{ if .Home }}[![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)]({{ .Home }}){{ end }}
 
@@ -95,29 +95,9 @@ helm delete azure-api-management-gateway
 The command removes all the Kubernetes components associated with the chart and
 deletes the release.
 
-## Which Settings Do I Need?
+## Common Scenarios
 
-The chart has many configuration options, but most users only need to configure a few key settings:
-
-### Essential Settings
-
-- **`gateway.configuration.uri`** (required) - The configuration endpoint URL from your Azure API Management gateway resource. Format: `https://<gateway-name>.configuration.azure-api.net`.
-- **`gateway.auth.key`** (required for token auth) - The gateway authentication token from Azure Portal. Starts with `GatewayKey`.
-- **`gateway.auth.type`** - Authentication method: `GatewayToken` (default, uses gateway.auth.key) or `AzureAdApp` (uses Azure AD app credentials).
-
-### Commonly Used Settings
-
-- **`highAvailability.enabled`** - Deploy with high availability (default: `true`). Distributes pods across availability zones and prevents voluntary disruptions.
-- **`replicaCount`** - Number of gateway replicas (default: `3`).
-- **`resources`** - CPU and memory limits/requests for production deployments.
-- **`observability.azureMonitor.metrics.enabled`** - Send metrics to Azure Monitor (default: `true`).
-- **`observability.opentelemetry.enabled`** - Enable OpenTelemetry observability (default: `false`).
-- **`observability.statsD.enabled`** - Push StatsD metrics (default: `false`).
-- **`security.tls.server.ciphers.allowedSuites`** - Customize TLS cipher suites for client connections.
-
-### Common Scenarios
-
-#### Minimal Installation (Gateway Token)
+### Gateway Token Authentication
 
 ```yaml
 gateway:
@@ -127,7 +107,7 @@ gateway:
     key: "GatewayKey ey..."
 ```
 
-#### Azure AD Authentication (Workload Identity)
+### Azure AD Authentication (Workload Identity)
 
 ```yaml
 gateway:
@@ -145,6 +125,14 @@ gateway:
 
 The following table lists the configurable parameters of the self-hosted Azure API Management gateway chart and
 their default values.
+
+The parameters are organized into the following categories:
+- **Gateway Configuration**: Connection and authentication settings (`gateway.*`)
+- **High Availability**: Deployment resilience settings (`highAvailability.*`)
+- **Observability**: Monitoring, logging, and telemetry (`observability.*`)
+- **Security**: TLS and security settings (`security.*`)
+- **Networking**: Service and ingress configuration (`service.*`, `ingress.*`)
+- **Advanced**: Additional deployment, pod, and resource settings
 
 {{ template "chart.valuesTable" . }}
 
