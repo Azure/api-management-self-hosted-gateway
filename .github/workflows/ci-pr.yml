@@ -9,7 +9,41 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  HELM_DOCS_VERSION: "1.14.2"
+
 jobs:
+  validate-helm-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install helm-docs
+      run: |
+        curl -fsSL https://github.com/norwoodj/helm-docs/releases/download/v${{ env.HELM_DOCS_VERSION }}/helm-docs_${{ env.HELM_DOCS_VERSION }}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
+        tar -xzf helm-docs.tar.gz
+        chmod +x helm-docs
+        sudo mv helm-docs /usr/local/bin/
+        helm-docs --version
+
+    - name: Run helm-docs
+      run: |
+        cd helm-charts/azure-api-management-gateway
+        helm-docs
+
+    - name: Check if README is up-to-date
+      run: |
+        if git diff --exit-code helm-charts/azure-api-management-gateway/README.md; then
+          echo "✅ README.md is up-to-date"
+        else
+          echo "❌ README.md is out of date. Please run 'helm-docs' in the helm-charts/azure-api-management-gateway directory and commit the changes."
+          git diff helm-charts/azure-api-management-gateway/README.md
+          exit 1
+        fi
+
   lint-helm:
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +65,7 @@ jobs:
   
   deploy-helm:
     runs-on: ubuntu-latest
-    needs: lint-helm
+    needs: [lint-helm, validate-helm-docs]
     strategy:
       fail-fast: false
       matrix:

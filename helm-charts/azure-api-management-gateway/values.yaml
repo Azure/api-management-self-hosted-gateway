@@ -2,22 +2,31 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# set to 'null' in case you want to remove `replicaCount` property from the deployment
+# -- Number of gateway replicas to deploy. Set to 'null' to remove `replicaCount` property from the deployment.
 replicaCount: 3
 
 image:
+  # -- Repository which provides the image.
   repository: mcr.microsoft.com/azure-api-management/gateway
+  # -- Policy to pull image.
   pullPolicy: IfNotPresent
+  # -- Tag of image to use. Defaults to app version of Helm chart.
   tag: 
 
+# -- Image pull secrets for private registries.
 imagePullSecrets: []
+# -- Override the name of the chart.
 nameOverride: ""
+# -- Override the full name of the release.
 fullnameOverride: ""
 
 gateway:
+  # -- Name of the gateway in Azure API Management. Required when using Azure AD authentication.
   name: 
   deployment:
+    # -- Determines the maximum time the Pod may spend in the Terminating phase. Learn more [about the termination of Pods](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution).
     terminationGracePeriodSeconds: 60
+    # -- Specifies the deployment [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) to use for replacing old pods by new ones. May be `Recreate` or `RollingUpdate`.
     strategy: {}
       # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
       # type: RollingUpdate
@@ -26,150 +35,212 @@ gateway:
       #   maxSurge: 25%
     network:
       proxy:
+        # -- Address of HTTP network proxy to use for all outbound HTTP requests to the backend services (egress).
         http: 
+        # -- Address of HTTPS network proxy to use for all outbound HTTPS requests to the backend services (egress).
         https: 
+        # -- List of addresses/domains that should be bypassed when using an HTTP(S) network proxy.
         bypass: 
     dns:
+      # -- Add custom host aliases (configuration endpoint e.g.). Check the [values.yaml](./values.yaml) for the details.
       hostAliases: {}
         # - ip: "<ip address>"
         #   hostnames:
         #   - "<instanceName>.configuration.azure-api.net"      
+    # -- Specify additional custom annotations to be set for the deployment manifest.
     #annotations:
     #  com.example/local: "test"
   configuration:
+    # -- Endpoint in Azure API Management to which every self-hosted agent has to connect.
     uri: 
     backup:
+      # -- If enabled will store a backup copy of the latest downloaded configuration on a storage volume.
       enabled: false
       persistentVolumeClaim:
+        # -- Use an existing Persistent Volume Claim (PVC) instead of creating one. *.persistentVolumeClaim.create needs to be false.
         existingName: ""
+        # -- Create a Persistent Volume Claim (PVC) with values specified in *.backup.persistentVolumeClaim.*.
         create: true
+        # -- storageClassName to be set on the Persistent Volume Claim (PVC). `null` means no storageClassName specified and will use the platform default, `""` means no storageClassName specified and none will be used.
         storageClassName: null
+        # -- Access mode for the Persistent Volume Claim (PVC).
         accessMode: ReadWriteMany
+        # -- Size of the Persistent Volume Claim (PVC) to be created.
         size: 50Mi
+    # -- Capability to specify a list of settings to add which are not supported by the Helm chart yet.
     additional: {}
   auth:
+    # -- Type of authentication to use for Azure API Management's Configuration API. Options are `GatewayToken` or `AzureAdApp`.
     type: GatewayToken
-    # When an existing secret is configured, the value specified here will not be used
+    # -- Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey`. When an existing secret is configured, the value specified here will not be used.
     key: 
     azureAd:
       tenant: 
+        # -- ID of the Azure AD tenant. Required when authentication type is `AzureAdApp`.
         id:
+      # -- Authority URL of Azure AD.
       authority: 
       app:
+        # -- Client ID of the Azure AD app to authenticate with (also known as application ID). Required when authentication type is `AzureAdApp`.
         id: 
+        # -- Secret of the Azure AD app to authenticate with. Required when authentication type is `AzureAdApp`.
         secret: 
 
 secret:
+  # -- Indication whether or not a Kubernetes secret should be created to store the authentication token.
   createSecret: true
+  # -- Name of the existing secret to be used by the gateway. Requires `secret.createSecret` to be false.
   existingSecretName: ""
 
 observability:
   logs:
     std:
+      # -- Format of standard output logs also referred to as container logs. Allowed values are `none`, `text` or `json`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
       format: text
+      # -- Level of logs outputted to standard output. Allowed values are `all`, `debug`, `info`, `warn`, `error` or `fatal`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
       level: info
+      # -- Indication whether or not output messages should use color. Allowed values are `true` or `false`.
       useColor: true
     local:
+      # -- Type of local logs to use. Allowed values are `none`, `auto`, `localsyslog`, `rfc5424`, `journal`, `json` or `forward`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
       type: auto
       localsyslog:
+        # -- Endpoint to send logs to with localsyslog protocol. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
         endpoint:
+        # -- Facility code as per [localsyslog](https://en.wikipedia.org/wiki/Syslog#Facility), for example `7`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
         facility:
       rfc5424:
+        # -- Endpoint to send logs to with rfc5424 protocol. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
         endpoint:
+        # -- Facility code as per [rfc5424](https://tools.ietf.org/html/rfc5424), for example `7`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
         facility:
       journal:
+        # -- Endpoint to send logs to with journal protocol. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
         endpoint:
       json:
+        # -- UDP endpoint that accepts JSON data. This can be a file path, `IP:port`, or `hostname:port` convention. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
         endpoint: 127.0.0.1:8888
 
   azureMonitor:
     metrics:
+      # -- Indication whether or not metrics should be sent to Azure Monitor. Learn more in [our documentation](https://docs.microsoft.com/en-us/azure/api-management/how-to-configure-cloud-metrics-logs#metrics).
       enabled: true
   opentelemetry:
+    # -- Indication whether or not OpenTelemetry observability should be provided for the gateway. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
     enabled: false
     collector:
+      # -- Uri of the OpenTelemetry Collector to push metrics to. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       uri: 
     histogram:
-      # Specify custom bucket sizes using ',' seperator.
-      # Example: '10,20'
+      # -- Define custom bucket sizes for all histograms in OpenTelemetry metrics. Format must be `,` separated (e.g., '10,20'). Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       buckets:
     systemMetrics:
+      # -- Indication whether or not system metrics should be collected by OpenTelemetry.
       enabled: false
   statsD:
+    # -- Indication whether or not StatsD metrics should be pushed by the gateway. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     enabled: false
+    # -- Endpoint to push StatsD metrics to. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     endpoint: 
+    # -- Defines the metrics sampling rate. Value can be between `0` and `1`. e.g., `0.5`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     sampling: 1
+    # -- Defines the [tagging format](https://github.com/prometheus/statsd_exporter#tagging-extensions) in StatsD metrics as per the official docs. Value can be `none`, `librato`, `dogStatsD`, `influxDB`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     tagFormat: dogStatsD
 
 security:
   tls:
     server:
       ciphers:
+        # -- A comma-separated list of ciphers to use for the TLS connection between the API client and the self-hosted gateway. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites).
         allowedSuites: 
     client:
       ciphers:
+        # -- A comma-separated list of ciphers to use for the TLS connection between the self-hosted gateway and the backend. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites).
         allowedSuites: 
 
 dapr:
+  # -- Indication whether or not Dapr integration should be used.
   enabled: false
   app:
+    # -- Application ID to use for Dapr integration.
     id:
+  # -- Defines which Configuration CRD Dapr should use.
   config: tracing
   logging:
+    # -- Indication whether or not logging should be in JSON format.
     useJsonOutput: true
+    # -- Level of log verbosity of Dapr sidecar.
     level: info
 
 service:
+  # -- Type of Kubernetes service to use to expose to serve traffic.
   type: ClusterIP
   loadBalancer:
+    # -- Defines if node ports will be automatically allocated for services with type `LoadBalancer`.
     allocateNodePorts: true
   ports:
+    # -- Port for HTTP traffic on service for other pods to talk to.
     http: 8080
+    # -- Port for HTTPS traffic on service for other pods to talk to.
     https: 8081
     instance:
+      # -- Port used for internal discovery of gateway instances to synchronize across all of them, ie for rate limiting.
       synchronization: 4290
+      # -- Port used for sending heartbeats to all instances for synchronization purposes.
       heartbeat: 4291
+  # -- Annotations to add to the Kubernetes service.
   annotations: {}
 
 ingress:
   # Experimental feature: See https://github.com/Azure/api-management-self-hosted-gateway-ingress
   controller:
+    # -- Indication whether or not Self-Hosted gateway should act as an Ingress controller. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
     enabled: false
+    # -- Kubernetes namespace to watch. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
     namespace: ""
+    # -- Annotations for ingress controller. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
     annotations: []
     dns:
+      # -- DNS suffix to use to build Kubernetes hostname for services inside the cluster. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
       suffix: "svc.cluster.local"
-    ingressClass:    
+    ingressClass:
+      # -- Controller name for ingress class. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
       controller: "azure-api-management/gateway"
+      # -- Annotations to apply to ingress class. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
       annotations: []
 
-serviceAccountName: "" # Deprecated, use serviceAccount.name instead
+# -- **Deprecated - Use `serviceAccount.name` instead.** Legacy field for specifying an existing service account. By default, a service account is now auto-generated with release name (see `serviceAccount.create`).
+serviceAccountName: ""
 
 serviceAccount:
+  # -- The name of the service account to use. If not set and `create` is true, a name is generated using the fullname template. If not set and `create` is false, falls back to `serviceAccountName` value.
   name: ""
+  # -- Specifies whether a service account should be created. When true, a service account is automatically generated with the deployment name.
   create: true
+  # -- Annotations to add to the service account.
   annotations: {}
+  # -- Labels to add to the service account.
   labels: {}
 
 probes:
+  # -- Configuration for readiness probes of the container. Uses `/status-0123456789abcdef` as endpoint for HTTP probes.
   readiness:
     httpGet:
       path: /status-0123456789abcdef
       port: http
+  # -- Configuration for liveness probes of the container. Uses `/status-0123456789abcdef` as endpoint for HTTP probes.
   liveness:
     httpGet:
       path: /status-0123456789abcdef
       port: http
+  # -- Configuration for startup probes of the container. Uses `/status-0123456789abcdef` as endpoint for HTTP probes.
   startup:
     httpGet:
       path: /status-0123456789abcdef
       port: http
 
+# -- Pod resource requests & limits. We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. If you do want to specify resources, uncomment the following lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
@@ -178,18 +249,25 @@ resources: {}
   #   memory: 128Mi
 
 highAvailability:
+  # -- Indication whether or not the gateway should be scheduled highly available in the cluster.
   enabled: true
   disruption:
+    # -- Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions).
     maximumUnavailable: 25%
   podTopologySpread:
+    # -- Indication how pods should be spread across nodes in case the requirement cannot be met. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/).
     whenUnsatisfiable: ScheduleAnyway
 
+# -- Node selector for pod assignment.
 nodeSelector: {}
 
+# -- Tolerations for pod assignment.
 tolerations: []
 
+# -- Affinity for pod assignment.
 affinity: {}
 
+# -- Privilege and access control settings for the container.
 securityContext: {}
   # allowPrivilegeEscalation: false
   # runAsNonRoot: true
@@ -200,6 +278,7 @@ securityContext: {}
   #   drop:
   #   - all
 
+# -- Privilege and access control settings for the pod.
 podSecurityContext: {}
   # fsGroup: 2000
   # fsGroupChangePolicy: OnRootMismatch # "OnRootMismatch" or "Always"
@@ -207,5 +286,6 @@ podSecurityContext: {}
   # runAsUser: 1001       # This is a built-in user, but you can use any user ie 1000 as well
   # runAsGroup: 2000      # This is just an example
 
+# -- Custom labels to add to all deployed objects.
 commonLabels: {}
   # Labels to add to all deployed objects
