@@ -349,3 +349,7 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Helm-docs artifacts
+helm-docs.tar.gz
+helm-docs

@@ -1,5 +1,7 @@
 # Azure API Management Gateway
 
+![Version: {{ .Version }}](https://img.shields.io/badge/Version-{{ .Version | replace "-" "--" }}-informational?style=flat-square) ![AppVersion: {{ .AppVersion }}](https://img.shields.io/badge/AppVersion-{{ .AppVersion | replace "-" "--" }}-informational?style=flat-square) {{ if .Home }}[![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)]({{ .Home }}){{ end }}
+
 <!-- This README is auto-generated using helm-docs. To update, run: helm-docs -->
 
 [Self-hosted Azure API Management gateway](https://docs.microsoft.com/en-us/azure/api-management/self-hosted-gateway-overview) allows you to run Azure API Management gateway anywhere - Any cloud, hybrid or on-premises.
@@ -91,12 +93,144 @@ helm delete azure-api-management-gateway
 The command removes all the Kubernetes components associated with the chart and
 deletes the release.
 
+## Common Scenarios
+
+### Gateway Token Authentication
+
+```yaml
+gateway:
+  configuration:
+    uri: "https://my-gateway.configuration.azure-api.net"
+  auth:
+    key: "GatewayKey ey..."
+```
+
+### Microsoft Entra ID (formerly Azure AD) Authentication - Workload Identity
+
+```yaml
+gateway:
+  name: "my-gateway"
+  configuration:
+    uri: "https://my-gateway.configuration.azure-api.net"
+  auth:
+    type: "WorkloadIdentity"
+    azureAd:
+      app:
+        id: "00000000-0000-0000-0000-000000000000"
+```
+
+### Microsoft Entra ID (formerly Azure AD) Authentication - Client Certificate
+
+```yaml
+gateway:
+  name: "my-gateway"
+  configuration:
+    uri: "https://my-gateway.configuration.azure-api.net"
+  auth:
+    type: "AzureAdApp"
+    azureAd:
+      tenant:
+        id: "00000000-0000-0000-0000-000000000000"
+      app:
+        id: "00000000-0000-0000-0000-000000000000"
+      # Client certificate should be provided via secret
+```
+
 ## Configuration
 
-The following table lists the configurable parameters of the self-hosted Azure API Management gateway chart and
-their default values.
+The following sections list the configurable parameters of the self-hosted Azure API Management gateway chart organized by category.
 
-{{ template "chart.valuesTable" . }}
+- [Gateway Configuration](#gateway-configuration)
+- [High Availability](#high-availability)
+- [Observability](#observability)
+- [Security](#security)
+- [Networking](#networking)
+- [Dapr](#dapr)
+- [Advanced Configuration](#advanced-configuration)
+
+### Gateway Configuration
+
+Connection and authentication settings for the Azure API Management gateway.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "gateway." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
+### High Availability
+
+Settings for deployment resilience.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "highAvailability." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
+### Observability
+
+Monitoring, logging, and telemetry configuration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "observability." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
+### Security
+
+TLS and security settings.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "security." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
+### Networking
+
+Service and ingress configuration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if or (hasPrefix "service." .Key) (hasPrefix "ingress." .Key) }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
+### Dapr
+
+Configuration for Dapr integration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "dapr." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
+
+### Advanced Configuration
+
+Additional deployment, pod, and resource settings.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if not (or (hasPrefix "gateway." .Key) (hasPrefix "highAvailability." .Key) (hasPrefix "observability." .Key) (hasPrefix "security." .Key) (hasPrefix "service." .Key) (hasPrefix "ingress." .Key) (hasPrefix "dapr." .Key)) }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 Specify each parameter using the `--set key=value[,key=value]` argument to
 `helm install`.

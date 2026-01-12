@@ -30,6 +30,8 @@ helm install azure-api-management-gateway  \
 
 This will deploy the Azure API Management Self-Hosted gateway on your Kubernetes cluster, but we provide options to configure it according to your needs.
 
+For detailed configuration options, authentication methods, high availability settings, and common scenarios, see the [azure-api-management-gateway chart README](helm-charts/azure-api-management-gateway/README.md).
+
 To learn more, we recommend inspecting the Helm chart:
 ```cli
 helm inspect all azure-apim-gateway/azure-api-management-gateway

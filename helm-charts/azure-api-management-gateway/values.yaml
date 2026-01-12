@@ -21,12 +21,12 @@ nameOverride: ""
 fullnameOverride: ""
 
 gateway:
-  # -- Name of the gateway in Azure API Management. Required when using Azure AD authentication.
+  # -- Name of the gateway resource in Azure API Management. This is required when using Azure AD authentication (WorkloadIdentity or AzureAdApp). Find this in the Azure Portal under your API Management instance.
   name: 
   deployment:
-    # -- Determines the maximum time the Pod may spend in the Terminating phase. Learn more [about the termination of Pods](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution).
+    # -- Maximum time in seconds the Pod may spend in the Terminating phase during shutdown. The gateway uses this time to gracefully complete ongoing requests. Learn more [about the termination of Pods](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution).
     terminationGracePeriodSeconds: 60
-    # -- Specifies the deployment [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) to use for replacing old pods by new ones. May be `Recreate` or `RollingUpdate`.
+    # -- Deployment [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) to use for replacing old pods. May be `Recreate` (stop all old pods before creating new ones) or `RollingUpdate` (default, gradually replace pods).
     strategy: {}
       # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
       # type: RollingUpdate
@@ -35,14 +35,14 @@ gateway:
       #   maxSurge: 25%
     network:
       proxy:
-        # -- Address of HTTP network proxy to use for all outbound HTTP requests to the backend services (egress).
+        # -- HTTP network proxy address for outbound HTTP requests to backend services (egress). Format: `http://proxy.example.com:8080`.
         http: 
-        # -- Address of HTTPS network proxy to use for all outbound HTTPS requests to the backend services (egress).
+        # -- HTTPS network proxy address for outbound HTTPS requests to backend services (egress). Format: `http://proxy.example.com:8080`.
         https: 
-        # -- List of addresses/domains that should be bypassed when using an HTTP(S) network proxy.
+        # -- Comma-separated list of addresses/domains to bypass when using an HTTP(S) network proxy. Example: `localhost,127.0.0.1,.svc.cluster.local`.
         bypass: 
     dns:
-      # -- Add custom host aliases (configuration endpoint e.g.). Check the [values.yaml](./values.yaml) for the details.
+      # -- Add custom host aliases to /etc/hosts in the gateway pod (useful for custom configuration endpoints). Check the [values.yaml](./values.yaml) for format details.
       hostAliases: {}
         # - ip: "<ip address>"
         #   hostnames:
@@ -51,39 +51,39 @@ gateway:
     #annotations:
     #  com.example/local: "test"
   configuration:
-    # -- Endpoint in Azure API Management to which every self-hosted agent has to connect.
+    # -- **Required.** Configuration endpoint URL from your Azure API Management gateway resource. Find this in the Azure Portal under the gateway's Deployment section. Format: `https://<gateway-name>.configuration.azure-api.net`.
     uri: 
     backup:
-      # -- If enabled will store a backup copy of the latest downloaded configuration on a storage volume.
+      # -- Enable storing a backup copy of the latest downloaded gateway configuration on a persistent volume. This allows the gateway to start with last-known configuration if it cannot reach Azure API Management.
       enabled: false
       persistentVolumeClaim:
-        # -- Use an existing Persistent Volume Claim (PVC) instead of creating one. *.persistentVolumeClaim.create needs to be false.
+        # -- Use an existing Persistent Volume Claim (PVC) for configuration backup instead of creating one. Requires `*.persistentVolumeClaim.create` to be false.
         existingName: ""
-        # -- Create a Persistent Volume Claim (PVC) with values specified in *.backup.persistentVolumeClaim.*.
+        # -- Create a new Persistent Volume Claim (PVC) for configuration backup with the settings specified below.
         create: true
-        # -- storageClassName to be set on the Persistent Volume Claim (PVC). `null` means no storageClassName specified and will use the platform default, `""` means no storageClassName specified and none will be used.
+        # -- Storage class name for the Persistent Volume Claim (PVC). `null` uses the cluster default storage class, `""` means no storage class will be set.
         storageClassName: null
-        # -- Access mode for the Persistent Volume Claim (PVC).
+        # -- Access mode for the Persistent Volume Claim (PVC). Use `ReadWriteMany` for multi-replica deployments, `ReadWriteOnce` for single replica.
         accessMode: ReadWriteMany
-        # -- Size of the Persistent Volume Claim (PVC) to be created.
+        # -- Size of the Persistent Volume Claim (PVC) for configuration backup.
         size: 50Mi
-    # -- Capability to specify a list of settings to add which are not supported by the Helm chart yet.
+    # -- Advanced: Specify additional gateway configuration settings not yet supported by the Helm chart. See [Azure API Management self-hosted gateway configuration](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-settings-reference).
     additional: {}
   auth:
-    # -- Type of authentication to use for Azure API Management's Configuration API. Options are `GatewayToken` or `AzureAdApp`.
+    # -- Type of authentication to use for Azure API Management's Configuration API. Options: `GatewayToken` (use gateway.auth.key), `AzureAdApp` (use client secret/certificate), or `WorkloadIdentity` (use managed identity).
     type: GatewayToken
-    # -- Authentication key to authenticate with to Azure API Management service. Typically starts with `GatewayKey`. When an existing secret is configured, the value specified here will not be used.
+    # -- **Required for GatewayToken auth.** Authentication token from Azure API Management gateway resource. Starts with `GatewayKey`. Find this in the Azure Portal under the gateway's Deployment section. Not used when an existing secret is configured.
     key: 
     azureAd:
       tenant: 
-        # -- ID of the Azure AD tenant. Required when authentication type is `AzureAdApp`.
+        # -- **Required for AzureAdApp auth.** Azure AD tenant ID (GUID). Find this in Azure Portal under Azure Active Directory → Properties.
         id:
-      # -- Authority URL of Azure AD.
+      # -- Azure AD authority URL. Defaults to public Azure AD if not specified. Example: `https://login.microsoftonline.com/<tenant-id>`.
       authority: 
       app:
-        # -- Client ID of the Azure AD app to authenticate with (also known as application ID). Required when authentication type is `AzureAdApp`.
+        # -- **Required for AzureAdApp and WorkloadIdentity auth.** Client ID (application ID) of the Azure AD app registered for gateway authentication. Find this in Azure Portal under App registrations.
         id: 
-        # -- Secret of the Azure AD app to authenticate with. Required when authentication type is `AzureAdApp`.
+        # -- **Required for AzureAdApp auth (client secret).** Client secret of the Azure AD app. Not used with WorkloadIdentity. Not used when an existing secret is configured.
         secret: 
 
 secret:
@@ -123,39 +123,39 @@ observability:
 
   azureMonitor:
     metrics:
-      # -- Indication whether or not metrics should be sent to Azure Monitor. Learn more in [our documentation](https://docs.microsoft.com/en-us/azure/api-management/how-to-configure-cloud-metrics-logs#metrics).
+      # -- Enable sending metrics to Azure Monitor. This allows you to monitor gateway performance in Azure Portal. Learn more in [our documentation](https://docs.microsoft.com/en-us/azure/api-management/how-to-configure-cloud-metrics-logs#metrics).
       enabled: true
   opentelemetry:
-    # -- Indication whether or not OpenTelemetry observability should be provided for the gateway. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
+    # -- Enable OpenTelemetry observability for the gateway. This provides distributed tracing and enhanced metrics. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
     enabled: false
     collector:
-      # -- Uri of the OpenTelemetry Collector to push metrics to. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
+      # -- OpenTelemetry Collector endpoint URI to push metrics and traces to. Format: `http://otel-collector:4317` (gRPC) or `http://otel-collector:4318` (HTTP). Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       uri: 
     histogram:
-      # -- Define custom bucket sizes for all histograms in OpenTelemetry metrics. Format must be `,` separated (e.g., '10,20'). Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
+      # -- Define custom bucket sizes for all histograms in OpenTelemetry metrics. Comma-separated values in milliseconds. Example: `10,20,50,100,200,500,1000`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       buckets:
     systemMetrics:
-      # -- Indication whether or not system metrics should be collected by OpenTelemetry.
+      # -- Enable collecting system metrics (CPU, memory) via OpenTelemetry in addition to API metrics.
       enabled: false
   statsD:
-    # -- Indication whether or not StatsD metrics should be pushed by the gateway. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
+    # -- Enable pushing StatsD metrics from the gateway. Useful for integration with Prometheus, Datadog, or other StatsD-compatible systems. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     enabled: false
-    # -- Endpoint to push StatsD metrics to. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
+    # -- StatsD endpoint to push metrics to. Format: `udp://statsd-server:8125`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     endpoint: 
-    # -- Defines the metrics sampling rate. Value can be between `0` and `1`. e.g., `0.5`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
+    # -- Metrics sampling rate. Value between `0` (no metrics) and `1` (all metrics). Example: `0.5` samples 50% of requests. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     sampling: 1
-    # -- Defines the [tagging format](https://github.com/prometheus/statsd_exporter#tagging-extensions) in StatsD metrics as per the official docs. Value can be `none`, `librato`, `dogStatsD`, `influxDB`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
+    # -- StatsD [tagging format](https://github.com/prometheus/statsd_exporter#tagging-extensions) for metric tags. Options: `none`, `librato`, `dogStatsD`, `influxDB`. Use `dogStatsD` for Datadog compatibility. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     tagFormat: dogStatsD
 
 security:
   tls:
     server:
       ciphers:
-        # -- A comma-separated list of ciphers to use for the TLS connection between the API client and the self-hosted gateway. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites).
+        # -- Comma-separated list of TLS cipher suites for client-to-gateway connections. Use this to enforce strong encryption or comply with security policies. Example: `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites).
         allowedSuites: 
     client:
       ciphers:
-        # -- A comma-separated list of ciphers to use for the TLS connection between the self-hosted gateway and the backend. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites).
+        # -- Comma-separated list of TLS cipher suites for gateway-to-backend connections. Use this to ensure compatibility with backend systems or enforce strong encryption. Example: `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`. Learn more in our [security / TLS documentation](https://aka.ms/apim/sputnik/security/tls). Default cipher suites are used as per [our documentation](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview#available-cipher-suites).
         allowedSuites: 
 
 dapr:
@@ -194,19 +194,19 @@ service:
 ingress:
   # Experimental feature: See https://github.com/Azure/api-management-self-hosted-gateway-ingress
   controller:
-    # -- Indication whether or not Self-Hosted gateway should act as an Ingress controller. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
+    # -- **Experimental.** Enable Self-Hosted gateway to act as a Kubernetes Ingress controller. This feature is experimental and under active development. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress) for details and limitations.
     enabled: false
-    # -- Kubernetes namespace to watch. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
+    # -- **Experimental.** Kubernetes namespace to watch for Ingress resources. Empty string watches all namespaces. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress).
     namespace: ""
-    # -- Annotations for ingress controller. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
+    # -- **Experimental.** Annotations to add to managed Ingress resources. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress).
     annotations: []
     dns:
-      # -- DNS suffix to use to build Kubernetes hostname for services inside the cluster. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
+      # -- **Experimental.** DNS suffix for building Kubernetes service hostnames inside the cluster. Example: `svc.cluster.local`. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress).
       suffix: "svc.cluster.local"
     ingressClass:
-      # -- Controller name for ingress class. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
+      # -- **Experimental.** Controller name for the IngressClass resource. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress).
       controller: "azure-api-management/gateway"
-      # -- Annotations to apply to ingress class. ([experimental feature](https://github.com/Azure/api-management-self-hosted-gateway-ingress)).
+      # -- **Experimental.** Annotations to apply to the IngressClass resource. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress).
       annotations: []
 
 # -- **Deprecated - Use `serviceAccount.name` instead.** Legacy field for specifying an existing service account. By default, a service account is now auto-generated with release name (see `serviceAccount.create`).
@@ -249,13 +249,13 @@ resources: {}
   #   memory: 128Mi
 
 highAvailability:
-  # -- Indication whether or not the gateway should be scheduled highly available in the cluster.
+  # -- Deploy the gateway with high availability features enabled. When true, distributes pods across availability zones and prevents voluntary disruptions. Recommended for production deployments.
   enabled: true
   disruption:
-    # -- Amount of pods that are allowed to be unavailable due to [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions).
+    # -- Maximum percentage or number of pods that can be unavailable during [voluntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions) like node drains or deployments. Example: `25%` or `1`.
     maximumUnavailable: 25%
   podTopologySpread:
-    # -- Indication how pods should be spread across nodes in case the requirement cannot be met. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/).
+    # -- How to handle pod scheduling when topology spread constraints cannot be met. `ScheduleAnyway` allows scheduling even if constraints are not met (preferred), `DoNotSchedule` prevents scheduling. Learn more in the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/).
     whenUnsatisfiable: ScheduleAnyway
 
 # -- Node selector for pod assignment.
