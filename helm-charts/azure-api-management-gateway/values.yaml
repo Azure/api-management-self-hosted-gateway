@@ -134,6 +134,9 @@ observability:
     histogram:
       # -- Define custom bucket sizes for all histograms in OpenTelemetry metrics. Format must be `,` separated (e.g., '10,20'). Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-deploy-self-hosted-gateway-kubernetes-opentelemetry).
       buckets: 
+    systemMetrics:
+      # -- Indication whether or not system metrics should be collected by OpenTelemetry.
+      enabled: false
   statsD:
     # -- Indication whether or not StatsD metrics should be pushed by the gateway. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#configure-the-self-hosted-gateway-to-emit-metrics).
     enabled: false

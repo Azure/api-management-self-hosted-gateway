@@ -20,6 +20,11 @@ data:
   config.service.auth.azureAd.authority : {{ .Values.gateway.auth.azureAd.authority | quote }}
   {{- end }}
 {{- end }}
+{{- if eq (lower $authenticationType) "workloadidentity" }}
+  {{- $gatewayName := .Values.gateway.name | required "No gateway name was specified in gateway.name." }}
+  gateway.name : {{ $gatewayName | quote }}
+  config.service.auth: "workloadIdentity"
+{{- end }}
 {{- if .Values.ingress.controller.enabled }}
   k8s.ingress.enabled : {{ .Values.ingress.controller.enabled | quote }}
   k8s.ingress.namespace : {{ .Values.ingress.controller.namespace | default ( .Release.Namespace ) | quote }}
@@ -66,6 +71,7 @@ data:
   observability.opentelemetry.histogram.buckets: {{ .Values.observability.opentelemetry.histogram.buckets | quote }}
   {{ end }}
 {{- end }}
+  observability.opentelemetry.system-metrics.enabled: {{ .Values.observability.opentelemetry.systemMetrics.enabled | quote }}
 {{- if .Values.security.tls.server.ciphers.allowedSuites }}
   net.server.tls.ciphers.allowed-suites: {{ .Values.security.tls.server.ciphers.allowedSuites | quote }}
 {{- end }}
