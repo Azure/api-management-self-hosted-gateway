@@ -1,8 +1,6 @@
 # Azure API Management Gateway
 
-![Version: 1.14.1](https://img.shields.io/badge/Version-1.14.1-informational?style=flat-square) ![AppVersion: 2.10.1](https://img.shields.io/badge/AppVersion-2.10.1-informational?style=flat-square)
-
-[![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview)
+![Version: 1.14.1](https://img.shields.io/badge/Version-1.14.1-informational?style=flat-square) ![AppVersion: 2.10.1](https://img.shields.io/badge/AppVersion-2.10.1-informational?style=flat-square) [![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview)
 
 <!-- This README is auto-generated using helm-docs. To update, run: helm-docs -->
 
@@ -107,7 +105,7 @@ gateway:
     key: "GatewayKey ey..."
 ```
 
-### Azure AD Authentication (Workload Identity)
+### Microsoft Entra ID (formerly Azure AD) Authentication - Workload Identity
 
 ```yaml
 gateway:
@@ -121,18 +119,54 @@ gateway:
         id: "00000000-0000-0000-0000-000000000000"
 ```
 
+### Microsoft Entra ID (formerly Azure AD) Authentication - Client Certificate
+
+```yaml
+gateway:
+  name: "my-gateway"
+  configuration:
+    uri: "https://my-gateway.configuration.azure-api.net"
+  auth:
+    type: "AzureAdApp"
+    azureAd:
+      tenant:
+        id: "00000000-0000-0000-0000-000000000000"
+      app:
+        id: "00000000-0000-0000-0000-000000000000"
+      # Client certificate should be provided via secret
+```
+
 ## Configuration
 
-The following table lists the configurable parameters of the self-hosted Azure API Management gateway chart and
-their default values.
+The following sections list the configurable parameters of the self-hosted Azure API Management gateway chart organized by category.
 
-The parameters are organized into the following categories:
-- **Gateway Configuration**: Connection and authentication settings (`gateway.*`)
-- **High Availability**: Deployment resilience settings (`highAvailability.*`)
-- **Observability**: Monitoring, logging, and telemetry (`observability.*`)
-- **Security**: TLS and security settings (`security.*`)
-- **Networking**: Service and ingress configuration (`service.*`, `ingress.*`)
-- **Advanced**: Additional deployment, pod, and resource settings
+### Gateway Configuration
+
+Connection and authentication settings for the Azure API Management gateway (`gateway.*`).
+
+### High Availability
+
+Deployment resilience settings (`highAvailability.*`).
+
+### Observability
+
+Monitoring, logging, and telemetry configuration (`observability.*`).
+
+### Security
+
+TLS and security settings (`security.*`).
+
+### Networking
+
+Service and ingress configuration (`service.*`, `ingress.*`).
+
+### Advanced Configuration
+
+Additional deployment, pod, and resource settings.
+
+---
+
+**All Configuration Parameters:**
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
