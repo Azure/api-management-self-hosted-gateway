@@ -142,33 +142,75 @@ The following sections list the configurable parameters of the self-hosted Azure
 
 ### Gateway Configuration
 
-Connection and authentication settings for the Azure API Management gateway (`gateway.*`).
+Connection and authentication settings for the Azure API Management gateway.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "gateway." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 ### High Availability
 
-Deployment resilience settings (`highAvailability.*`).
+Deployment resilience settings.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "highAvailability." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 ### Observability
 
-Monitoring, logging, and telemetry configuration (`observability.*`).
+Monitoring, logging, and telemetry configuration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "observability." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 ### Security
 
-TLS and security settings (`security.*`).
+TLS and security settings.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if hasPrefix "security." .Key }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 ### Networking
 
-Service and ingress configuration (`service.*`, `ingress.*`).
+Service and ingress configuration.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if or (hasPrefix "service." .Key) (hasPrefix "ingress." .Key) }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 ### Advanced Configuration
 
 Additional deployment, pod, and resource settings.
 
----
-
-**All Configuration Parameters:**
-
-{{ template "chart.valuesTable" . }}
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+{{- range .Values }}
+  {{- if not (or (hasPrefix "gateway." .Key) (hasPrefix "highAvailability." .Key) (hasPrefix "observability." .Key) (hasPrefix "security." .Key) (hasPrefix "service." .Key) (hasPrefix "ingress." .Key)) }}
+| `{{ .Key }}` | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+  {{- end }}
+{{- end }}
 
 Specify each parameter using the `--set key=value[,key=value]` argument to
 `helm install`.
