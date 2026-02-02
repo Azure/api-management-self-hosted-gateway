@@ -1,6 +1,6 @@
 # Azure API Management Gateway
 
-![Version: 1.14.1](https://img.shields.io/badge/Version-1.14.1-informational?style=flat-square) ![AppVersion: 2.10.1](https://img.shields.io/badge/AppVersion-2.10.1-informational?style=flat-square) [![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview)
+![Version: 1.15.0](https://img.shields.io/badge/Version-1.15.0-informational?style=flat-square) ![AppVersion: 2.11.0](https://img.shields.io/badge/AppVersion-2.11.0-informational?style=flat-square) [![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview)
 
 <!-- This README is auto-generated using helm-docs. To update, run: helm-docs -->
 
