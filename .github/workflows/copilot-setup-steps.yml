@@ -1,0 +1,40 @@
+name: "Copilot Setup Steps"
+
+# Automatically run the setup steps when they are changed to allow for easy validation, and
+# allow manual testing through the repository's "Actions" tab
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+env:
+  HELM_DOCS_VERSION: "1.14.2"
+
+jobs:
+  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    # Set the permissions to the lowest permissions possible needed for your steps.
+    # Copilot will be given its own token for its operations.
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: Azure/setup-helm@v4
+
+      - name: Install helm-docs
+        run: |
+          curl -fsSL https://github.com/norwoodj/helm-docs/releases/download/v${{ env.HELM_DOCS_VERSION }}/helm-docs_${{ env.HELM_DOCS_VERSION }}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
+          tar -xzf helm-docs.tar.gz
+          chmod +x helm-docs
+          sudo mv helm-docs /usr/local/bin/
+          helm-docs --version
