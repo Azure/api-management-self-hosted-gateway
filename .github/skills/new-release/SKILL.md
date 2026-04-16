@@ -15,8 +15,19 @@ This skill guides you through the full release process for the Azure API Managem
 
 Before starting, confirm the user provides:
 
-1. **Helm chart version** (required) — the new semver version (e.g. `1.16.0`)
-2. **Container image version** (optional) — if a new container image is being released (e.g. `2.12.0`)
+1. **Container image version** (required) — the new container image version being shipped (e.g. `2.12.0`)
+2. **Helm chart version** — derived from the container image version bump and the current Helm chart version:
+   - **Minor bump** (e.g. `2.11.x` → `2.12.0`): increment the Helm chart **minor** version (e.g. `1.15.x` → `1.16.0`)
+   - **Patch bump** (e.g. `2.11.0` → `2.11.1`): increment the Helm chart **patch** version (e.g. `1.15.0` → `1.15.1`)
+
+## Versioning Convention
+
+The Helm chart version tracks the container image version bump type:
+
+| Container image bump | Helm chart bump | Example (container) | Example (chart) |
+|---|---|---|---|
+| Minor (`X.Y.0`) | Minor | `2.11.0` → `2.12.0` | `1.15.x` → `1.16.0` |
+| Patch (`X.Y.Z`) | Patch | `2.11.0` → `2.11.1` | `1.15.0` → `1.15.1` |
 
 ## Release Process
 
@@ -25,6 +36,7 @@ Follow the release process documented in [`CONTRIBUTING.md` § Release Process](
 Key points:
 
 - Read `helm-charts/azure-api-management-gateway/Chart.yaml` to get the current `version` and `appVersion`
+- Determine the correct Helm chart version using the versioning convention above
 - Validate that the new Helm chart version is greater than the current version
 - Create a `release/<helmChartVersion>` branch from `main`
 - Use `--no-verify` when committing (the pre-commit hook requires Docker for helm-docs-container, but we run helm-docs natively)
