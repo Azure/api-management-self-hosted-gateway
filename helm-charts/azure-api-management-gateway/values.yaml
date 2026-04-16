@@ -97,7 +97,7 @@ observability:
     std:
       # -- Format of standard output logs also referred to as container logs. Allowed values are `none`, `text` or `json`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
       format: text
-      # -- Level of logs outputted to standard output. Allowed values are `all`, `debug`, `info`, `warn`, `error` or `fatal`. Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
+      # -- Level of logs outputted to standard output. Allowed values are `all`, `debug`, `info`, `warn`, `error` or `fatal`. Severity increases from `all` (everything) and `debug` (debug and above) through `info`, `warn`, and `error`, to `fatal` (fatal events only). Learn more in [our documentation](https://docs.microsoft.com/azure/api-management/how-to-configure-local-metrics-logs#logs).
       level: info
       # -- Indication whether or not output messages should use color. Allowed values are `true` or `false`.
       useColor: true
