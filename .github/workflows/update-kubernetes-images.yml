@@ -77,8 +77,8 @@ jobs:
               if count == 0:
                   raise SystemExit(f"Could not find the Kind matrix in {filename}")
               content = re.sub(
-                  r"         version: v\d+\.\d+\.\d+",
-                  f"         version: {release['tag_name']}",
+                  r"        version: v\d+\.\d+\.\d+",
+                  f"        version: {release['tag_name']}",
                   content,
               )
               path.write_text(content)
