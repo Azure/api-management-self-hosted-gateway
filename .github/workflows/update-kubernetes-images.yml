@@ -24,6 +24,7 @@ jobs:
         run: |
           release="$(curl --fail --silent --show-error \
             --header "Accept: application/vnd.github+json" \
+            --oauth2-bearer "$GH_TOKEN" \
             https://api.github.com/repos/kubernetes-sigs/kind/releases/latest)"
           RELEASE_JSON="${release}" python3 - <<'PY'
           import json
