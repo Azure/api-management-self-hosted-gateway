@@ -1,0 +1,106 @@
+name: Update Kubernetes CI images
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update pinned Kind images
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release="$(curl --fail --silent --show-error \
+            --header "Accept: application/vnd.github+json" \
+            --oauth2-bearer "$GH_TOKEN" \
+            https://api.github.com/repos/kubernetes-sigs/kind/releases/latest)"
+          RELEASE_JSON="${release}" python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          release = json.loads(os.environ["RELEASE_JSON"])
+          body = release["body"]
+          images = {}
+          for version, digest in re.findall(
+              r"v(1\.\d+\.\d+): `kindest/node:v\1@"
+              r"(sha256:[0-9a-f]+)`",
+              body,
+          ):
+              images[".".join(version.split(".")[:2])] = f"kindest/node:v{version}@{digest}"
+
+          if len(images) < 4:
+              raise SystemExit("The latest Kind release did not publish four node images")
+
+          selected = sorted(images, key=lambda version: int(version.split(".")[1]), reverse=True)[:4]
+          matrix = ", ".join(selected)
+          entries = "\n".join(
+              f"        - kubernetesVersion: {version}\n"
+              f"          kindImage: {images[version]}"
+              for version in selected
+          )
+          pattern = re.compile(
+              r"        kubernetesVersion: \[[^\]]+\]\n"
+              r"        include:\n"
+              r"          # Images are defined on every Kind release\n"
+              r"          # See https://github.com/kubernetes-sigs/kind/releases "
+              r"for an overview of the images\n"
+              r"(?P<entries>(?:        - kubernetesVersion:.*\n"
+              r"          kindImage:.*\n)+)"
+          )
+
+          for filename in (".github/workflows/ci-main.yml", ".github/workflows/ci-pr.yml"):
+              path = Path(filename)
+              content = path.read_text()
+              content, count = pattern.subn(
+                  f"        kubernetesVersion: [{matrix}]\\n"
+                  "        include:\n"
+                  "          # Images are defined on every Kind release\n"
+                  "          # See https://github.com/kubernetes-sigs/kind/releases "
+                  "for an overview of the images\n"
+                  f"{entries}\n",
+                  content,
+              )
+              if count == 0:
+                  raise SystemExit(f"Could not find the Kind matrix in {filename}")
+              content = re.sub(
+                  r"        version: v\d+\.\d+\.\d+",
+                  f"        version: {release['tag_name']}",
+                  content,
+              )
+              path.write_text(content)
+          PY
+
+      - name: Create pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            echo "Kind images are already current."
+            exit 0
+          fi
+          branch="automation/update-kubernetes-images"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "${branch}"
+          git add .github/workflows .github/skills/update-kubernetes-images
+          git commit -m "chore: update Kubernetes CI images"
+          git push --force-with-lease origin "${branch}"
+          if ! gh pr view "${branch}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh pr create --repo "${GITHUB_REPOSITORY}" --base main --head "${branch}" \
+              --title "chore: update Kubernetes CI images" \
+              --body "Updates the pinned Kind node images and CLI version from the latest Kind release."
+          fi
