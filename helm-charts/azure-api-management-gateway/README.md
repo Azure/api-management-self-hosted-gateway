@@ -234,6 +234,7 @@ Service and ingress configuration.
 | `ingress.controller.ingressClass.controller` | string | `"azure-api-management/gateway"` | **Experimental.** Controller name for the IngressClass resource. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress). |
 | `ingress.controller.namespace` | string | `""` | **Experimental.** Kubernetes namespace to watch for Ingress resources. Empty string watches all namespaces. See the [ingress controller repository](https://github.com/Azure/api-management-self-hosted-gateway-ingress). |
 | `service.annotations` | object | `{}` | Annotations to add to the Kubernetes service. |
+| `service.externalTrafficPolicy` | string | `nil` | External traffic policy for the gateway service (`Cluster` or `Local`). Only applies to `NodePort` and `LoadBalancer` service types. |
 | `service.loadBalancer.allocateNodePorts` | bool | `true` | Defines if node ports will be automatically allocated for services with type `LoadBalancer`. |
 | `service.ports.http` | int | `8080` | Port for HTTP traffic on service for other pods to talk to. |
 | `service.ports.https` | int | `8081` | Port for HTTPS traffic on service for other pods to talk to. |

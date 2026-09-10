@@ -175,6 +175,8 @@ dapr:
 service:
   # -- Type of Kubernetes service to use to expose to serve traffic.
   type: ClusterIP
+  # -- External traffic policy for the gateway service (`Cluster` or `Local`). Only applies to `NodePort` and `LoadBalancer` service types.
+  externalTrafficPolicy:
   loadBalancer:
     # -- Defines if node ports will be automatically allocated for services with type `LoadBalancer`.
     allocateNodePorts: true
