@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.service.type }}
+{{- if and .Values.service.externalTrafficPolicy (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+{{- end }}
 {{- if eq .Values.service.type "LoadBalancer" }}
 {{- if (.Values.service.loadBalancer).ip }}
   loadBalancerIP: {{ .Values.service.loadBalancer.ip }}
