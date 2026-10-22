@@ -64,11 +64,12 @@ jobs:
       run: helm lint helm-charts/azure-api-management-gateway --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.type="AzureAdApp" --set gateway.name=gateway-name --set gateway.auth.azureAd.tenant.id=ci-tenant-id --set gateway.auth.azureAd.app.id=ci-app-id --set gateway.auth.azureAd.app.secret=xyz
   
   deploy-helm:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.architecture == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     needs: [lint-helm, validate-helm-docs]
     strategy:
       fail-fast: false
       matrix:
+        architecture: [amd64, arm64]
         enableHighAvailability: [false, true]
         kubernetesVersion: [v1.36, v1.35, v1.34, v1.33]
         include:
@@ -82,7 +83,7 @@ jobs:
           kindImage: kindest/node:v1.34.8@sha256:02722c2dedddcfc00febf5d27fbeb9b7b2c14294c82109ff4a85d89ac9ba3256
         - kubernetesVersion: v1.33
           kindImage: kindest/node:v1.33.12@sha256:3f5c8443c620245e4d355cfe09e96a91ead32ceaa569d3f1ca9edf0cb2fe2ff4
-    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
+    name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} on ${{ matrix.architecture }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -90,12 +91,13 @@ jobs:
         fetch-depth: 0
 
     - name: Helm install
-      uses: Azure/setup-helm@v1
+      uses: Azure/setup-helm@v4.3.1
       
     - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
-      uses: helm/kind-action@v1.2.0
+      uses: helm/kind-action@v1.12.0
       with:
         version: v0.32.0
+        kubectl_version: ${{ matrix.kubernetesVersion }}.0
         node_image: ${{ matrix.kindImage }}
         config: ./testing/kind-cluster.yml
 
