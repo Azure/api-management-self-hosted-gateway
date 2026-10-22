@@ -1,6 +1,6 @@
 # Azure API Management Gateway
 
-![Version: 1.17.0](https://img.shields.io/badge/Version-1.17.0-informational?style=flat-square) ![AppVersion: 2.13.0](https://img.shields.io/badge/AppVersion-2.13.0-informational?style=flat-square) [![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview)
+![Version: 1.16.2](https://img.shields.io/badge/Version-1.16.2-informational?style=flat-square) ![AppVersion: 2.12.2](https://img.shields.io/badge/AppVersion-2.12.2-informational?style=flat-square) [![Documentation](https://img.shields.io/badge/docs-azure.com-blue?style=flat-square)](https://docs.microsoft.com/azure/api-management/self-hosted-gateway-overview)
 
 <!-- This README is auto-generated using helm-docs. To update, run: helm-docs -->
 
@@ -100,9 +100,11 @@ deletes the release.
 
 Gateway image version 2.13.0 supports both Linux AMD64 and ARM64 using the same image tag. Kubernetes automatically pulls the image matching the node architecture; no architecture-specific image repository or tag is required.
 
-By default, the chart does not restrict the node architecture, so gateway pods can run on either architecture in a mixed-architecture cluster. To deploy only to ARM64 nodes, use:
+By default, the chart does not restrict the node architecture. With gateway image version 2.13.0 or later, gateway pods can run on either architecture in a mixed-architecture cluster. To select an ARM64-capable image and deploy only to ARM64 nodes, use:
 
 ```yaml
+image:
+  tag: "2.13.0"
 nodeSelector:
   kubernetes.io/os: linux
   kubernetes.io/arch: arm64
