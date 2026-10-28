@@ -99,6 +99,10 @@ credentials. Both workflows retrieve secrets with the runner's Azure CLI and
 publish masked step outputs using `GITHUB_OUTPUT`, including on ARM64.
 No additional repository secrets or CI client secret are required.
 
+PR deployments use the same gateway-token authentication and chart-default
+gateway image as main's gateway-token deployment job, without a PR-only image
+version override.
+
 Azure login and secret retrieval run only for same-repository PRs (excluding
 Dependabot) and manual dispatches on `main`. Fork PRs, Dependabot runs, and
 dispatches on other branches retain the existing credential-free deployment
