@@ -10,12 +10,33 @@ permissions:
   contents: read
 
 env:
-  AZURE_TENANT_ID: 72f988bf-86f1-41af-91ab-2d7cd011db47
-  AZURE_SUBSCRIPTION_ID: a200340d-6b82-494d-9dbf-687ba6e33f9e
-  AZURE_CI_CLIENT_ID: 359b42a2-78a3-49e7-9be3-6ddfd1a27329
+  AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  AZURE_CI_CLIENT_ID: ${{ vars.AZURE_CI_CLIENT_ID }}
+  GATEWAY_AZURE_AD_TENANT_ID: ${{ vars.GATEWAY_AZURE_AD_TENANT_ID }}
+  GATEWAY_AZURE_AD_CLIENT_ID: ${{ vars.GATEWAY_AZURE_AD_CLIENT_ID }}
 
 jobs:
+  validate-azure-configuration:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validate Azure configuration
+      shell: bash
+      env:
+        AZURE_KEY_VAULT_NAME: ${{ vars.AZURE_KEY_VAULT_NAME }}
+        GATEWAY_NAME: ${{ vars.GATEWAY_NAME }}
+      run: |
+        missing=0
+        for name in AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID AZURE_CI_CLIENT_ID AZURE_KEY_VAULT_NAME GATEWAY_NAME GATEWAY_AZURE_AD_TENANT_ID GATEWAY_AZURE_AD_CLIENT_ID; do
+          if [[ -z "$(printenv "$name")" ]]; then
+            echo "::error::Set the $name repository variable. See CONTRIBUTING.md for CI federation setup."
+            missing=1
+          fi
+        done
+        exit "$missing"
+
   deploy-gateway-token:
+    needs: validate-azure-configuration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -41,11 +62,12 @@ jobs:
         fetch-depth: 0
 
     - name: Authenticate to Azure
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         tenant-id: ${{ env.AZURE_TENANT_ID }}
         subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
         client-id: ${{ env.AZURE_CI_CLIENT_ID }}
+        audience: api://AzureADTokenExchange
 
     - name: Get gateway secrets from Azure Key Vault
       id: fetched-secrets
@@ -112,6 +134,7 @@ jobs:
       if: always()
 
   deploy-azure-ad:
+    needs: validate-azure-configuration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -137,11 +160,12 @@ jobs:
         fetch-depth: 0
 
     - name: Authenticate to Azure
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         tenant-id: ${{ env.AZURE_TENANT_ID }}
         subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
         client-id: ${{ env.AZURE_CI_CLIENT_ID }}
+        audience: api://AzureADTokenExchange
 
     - name: Get gateway secrets from Azure Key Vault
       id: fetched-secrets
@@ -194,10 +218,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.type=AzureAdApp --set gateway.name=${{ vars.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }}  --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.type=AzureAdApp --set gateway.name=${{ vars.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.GATEWAY_AZURE_AD_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.GATEWAY_AZURE_AD_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }}  --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.type=AzureAdApp --set gateway.name=${{ vars.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.AZURE_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.AZURE_CI_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set gateway.configuration.uri=${{ steps.fetched-secrets.outputs.configurationUrl }} --set gateway.auth.type=AzureAdApp --set gateway.name=${{ vars.GATEWAY_NAME }} --set gateway.auth.azureAd.tenant.id=${{ env.GATEWAY_AZURE_AD_TENANT_ID }} --set gateway.auth.azureAd.app.id=${{ env.GATEWAY_AZURE_AD_CLIENT_ID }} --set gateway.auth.azureAd.app.secret=${{ steps.fetched-secrets.outputs.adAppSecret }} --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway

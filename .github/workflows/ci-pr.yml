@@ -6,13 +6,41 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write
   contents: read
 
 env:
   HELM_DOCS_VERSION: "1.14.2"
 
 jobs:
+  validate-azure-configuration:
+    runs-on: ubuntu-latest
+    outputs:
+      use-azure: ${{ steps.configuration.outputs.use-azure }}
+    steps:
+    - name: Validate Azure configuration for trusted runs
+      id: configuration
+      shell: bash
+      env:
+        USE_AZURE: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        AZURE_CI_CLIENT_ID: ${{ vars.AZURE_CI_CLIENT_ID }}
+        AZURE_KEY_VAULT_NAME: ${{ vars.AZURE_KEY_VAULT_NAME }}
+      run: |
+        echo "use-azure=$USE_AZURE" >> "$GITHUB_OUTPUT"
+        if [[ "$USE_AZURE" != "true" ]]; then
+          echo "Running credential-free chart tests for this event."
+          exit 0
+        fi
+        missing=0
+        for name in AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID AZURE_CI_CLIENT_ID AZURE_KEY_VAULT_NAME; do
+          if [[ -z "$(printenv "$name")" ]]; then
+            echo "::error::Set the $name repository variable. See CONTRIBUTING.md for CI federation setup."
+            missing=1
+          fi
+        done
+        exit "$missing"
+
   validate-helm-docs:
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +93,13 @@ jobs:
   
   deploy-helm:
     runs-on: ${{ matrix.architecture == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-    needs: [lint-helm, validate-helm-docs]
+    needs: [lint-helm, validate-helm-docs, validate-azure-configuration]
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GATEWAY_CONFIG_URL: xyz.configuration.azure-api.net
+      GATEWAY_TOKEN: xyz
     strategy:
       fail-fast: false
       matrix:
@@ -89,6 +123,36 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
+    - name: Authenticate to Azure
+      if: needs.validate-azure-configuration.outputs.use-azure == 'true'
+      uses: azure/login@v2
+      with:
+        tenant-id: ${{ vars.AZURE_TENANT_ID }}
+        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ vars.AZURE_CI_CLIENT_ID }}
+        audience: api://AzureADTokenExchange
+
+    - name: Get gateway secrets from Azure Key Vault
+      if: needs.validate-azure-configuration.outputs.use-azure == 'true'
+      shell: bash
+      env:
+        AZURE_KEY_VAULT_NAME: ${{ vars.AZURE_KEY_VAULT_NAME }}
+      run: |
+        set -euo pipefail
+        configuration_url=$(az keyvault secret show --name Gateway-Configuration-Url --vault-name "$AZURE_KEY_VAULT_NAME" --query value --output tsv)
+        gateway_token=$(az keyvault secret show --name Gateway-Token --vault-name "$AZURE_KEY_VAULT_NAME" --query value --output tsv)
+        echo "::add-mask::$configuration_url"
+        echo "::add-mask::$gateway_token"
+        if [[ -z "$configuration_url" || -z "$gateway_token" ]]; then
+          echo "::error::Gateway-Configuration-Url and Gateway-Token must not be empty."
+          exit 1
+        fi
+        if [[ "$configuration_url" == *$'\n'* || "$configuration_url" == *$'\r'* || "$gateway_token" == *$'\n'* || "$gateway_token" == *$'\r'* ]]; then
+          echo "::error::Gateway-Configuration-Url and Gateway-Token must be single-line values."
+          exit 1
+        fi
+        printf 'GATEWAY_CONFIG_URL=%s\nGATEWAY_TOKEN=%s\n' "$configuration_url" "$gateway_token" >> "$GITHUB_ENV"
 
     - name: Helm install
       uses: Azure/setup-helm@v4.3.1
@@ -129,10 +193,10 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set image.tag=2.13.0 --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="xyz" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set image.tag=2.13.0 --set-string gateway.configuration.uri="$GATEWAY_CONFIG_URL" --set-string gateway.auth.key="$GATEWAY_TOKEN" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set image.tag=2.13.0 --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="xyz" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set image.tag=2.13.0 --set-string gateway.configuration.uri="$GATEWAY_CONFIG_URL" --set-string gateway.auth.key="$GATEWAY_TOKEN" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
