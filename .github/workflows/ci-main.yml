@@ -36,12 +36,12 @@ jobs:
     name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
       with:
         fetch-depth: 0
 
     - name: Authenticate to Azure
-      uses: azure/login@v2
+      uses: azure/login@8216e11d8cd9b42fe925c852af8e76311ff067ac # v2
       with:
         tenant-id: ${{ env.AZURE_TENANT_ID }}
         subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
@@ -70,10 +70,10 @@ jobs:
         printf 'configurationUrl=%s\ngatewayToken=%s\n' "$configuration_url" "$gateway_token" >> "$GITHUB_OUTPUT"
 
     - name: Helm install
-      uses: Azure/setup-helm@v1
+      uses: Azure/setup-helm@18bc76811624f360dbd7f18c2d4ecb32c7b87bab # v1.1
       
     - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
-      uses: helm/kind-action@v1.2.0
+      uses: helm/kind-action@94729529f85113b88f4f819c17ce61382e6d8478 # v1.2.0
       with:
         version: v0.32.0
         node_image: ${{ matrix.kindImage }}
@@ -147,12 +147,12 @@ jobs:
     name: Deploy to Kubernetes ${{ matrix.kubernetesVersion }} (${{ (matrix.enableHighAvailability == true && 'With HA') || 'Without HA' }})
     steps:
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
       with:
         fetch-depth: 0
 
     - name: Authenticate to Azure
-      uses: azure/login@v2
+      uses: azure/login@8216e11d8cd9b42fe925c852af8e76311ff067ac # v2
       with:
         tenant-id: ${{ env.AZURE_TENANT_ID }}
         subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
@@ -181,10 +181,10 @@ jobs:
         printf 'configurationUrl=%s\nadAppSecret=%s\n' "$configuration_url" "$app_secret" >> "$GITHUB_OUTPUT"
 
     - name: Helm install
-      uses: Azure/setup-helm@v1
+      uses: Azure/setup-helm@18bc76811624f360dbd7f18c2d4ecb32c7b87bab # v1.1
       
     - name: Create k8s ${{ matrix.kubernetesVersion }} Kind Cluster
-      uses: helm/kind-action@v1.2.0
+      uses: helm/kind-action@94729529f85113b88f4f819c17ce61382e6d8478 # v1.2.0
       with:
         version: v0.32.0
         node_image: ${{ matrix.kindImage }}
