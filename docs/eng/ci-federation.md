@@ -3,26 +3,30 @@
 The main CI workflow and trusted PR deployments use GitHub Actions OIDC to
 authenticate to Azure without a CI client secret. Both main deployment matrices
 and the PR deployment matrix use the same federated identity to read gateway
-credentials from Key Vault. The gateway's `AzureAdApp` authentication is separate
-and still uses the `Azure-Ad-App-Secret` secret.
+credentials from Key Vault. The main workflow's `AzureAdApp` gateway test uses
+the same tenant and application as CI, with its client secret stored in Key Vault
+as `Azure-Ad-App-Secret`. CI login itself does not use this client secret.
 
-Configure these repository Actions variables before running the workflows:
+Configure these repository Actions secrets before running the workflows:
 
-| Variable | Purpose |
+| Secret | Purpose |
 | --- | --- |
 | `AZURE_TENANT_ID` | Entra tenant containing the CI identity. |
 | `AZURE_SUBSCRIPTION_ID` | Subscription accessible to the CI identity, containing the Key Vault. |
-| `AZURE_CI_CLIENT_ID` | Application (client) ID of the CI app registration or user-assigned managed identity. |
+| `AZURE_CI_CLIENT_ID` | Application (client) ID of the CI app registration, also used by the gateway's Azure AD test. |
+
+Configure these repository Actions variables:
+
+| Variable | Purpose |
+| --- | --- |
 | `AZURE_KEY_VAULT_NAME` | Vault containing `Gateway-Configuration-Url`, `Gateway-Token`, and `Azure-Ad-App-Secret`. |
 | `GATEWAY_NAME` | APIM self-hosted gateway name. |
-| `GATEWAY_AZURE_AD_TENANT_ID` | Tenant used by the gateway's Azure AD application, independent of the CI tenant. |
-| `GATEWAY_AZURE_AD_CLIENT_ID` | Gateway application's client ID matching `Azure-Ad-App-Secret`, independent of the CI identity. |
 
-When moving only CI to another tenant, keep the gateway tenant, application,
-and gateway credentials unchanged. Previously, CI and gateway authentication
-shared tenant `72f988bf-86f1-41af-91ab-2d7cd011db47` and client ID
-`359b42a2-78a3-49e7-9be3-6ddfd1a27329`; use these for the two gateway variables
-when retaining that gateway application.
+When moving tenants, ensure `Azure-Ad-App-Secret` matches the application in
+`AZURE_CI_CLIENT_ID` and that the application is authorized to access the APIM
+gateway configuration. A managed identity can authenticate CI using federation,
+but cannot supply the client secret required by this shared-identity
+`AzureAdApp` gateway test; use an app registration for the complete main matrix.
 
 ## Configure the Main Federated Credential
 
@@ -88,11 +92,12 @@ az ad app federated-credential create \
 For a user-assigned managed identity, add a credential with the same issuer,
 subject, and audience on that identity instead.
 
-The PR workflow uses the same Azure login action and repository variables as
+The PR workflow uses the same Azure login action and repository secrets as
 main CI. It reads only `Gateway-Configuration-Url` and `Gateway-Token` and passes
 them to Helm through step outputs; its lint checks continue using dummy
-credentials. Secret retrieval uses the runner's Azure CLI on both architectures.
-No additional repository variables or CI client secret are required.
+credentials. Both workflows retrieve secrets with the runner's Azure CLI and
+publish masked step outputs using `GITHUB_OUTPUT`, including on ARM64.
+No additional repository secrets or CI client secret are required.
 
 Azure login and secret retrieval run only for same-repository PRs (excluding
 Dependabot) and manual dispatches on `main`. Fork PRs, Dependabot runs, and
@@ -113,9 +118,9 @@ Grant the CI identity permission to read the three secrets in the destination
 Key Vault (for example, **Key Vault Secrets User** on an RBAC-enabled vault),
 and ensure the vault permits network access from the hosted runners. If moving
 the vault, securely provision the gateway credentials there; do not commit them.
-Then set the repository variables and dispatch **Helm Chart CI (Main)** on `main`
+Then set the repository secrets and variables and dispatch **Helm Chart CI (Main)** on `main`
 after the workflow changes are merged.
 
 `AADSTS70025` means the selected CI application has no federated credentials;
-changing workflow variables alone cannot fix it. The credential must exist in
+changing workflow settings alone cannot fix it. The credential must exist in
 Entra before authentication can succeed.

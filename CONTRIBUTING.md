@@ -40,7 +40,7 @@ The CI workflow will validate that the README is up-to-date with the values.yaml
 ## CI Federation Setup
 
 See the [CI federation setup guide](docs/eng/ci-federation.md) for Azure identity,
-repository variable, and federated credential configuration.
+repository secret/variable, and federated credential configuration.
 
 ## Release Process
 

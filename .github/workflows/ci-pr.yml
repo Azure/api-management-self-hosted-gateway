@@ -10,9 +10,9 @@ permissions:
 
 env:
   HELM_DOCS_VERSION: "1.14.2"
-  AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-  AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-  AZURE_CI_CLIENT_ID: ${{ vars.AZURE_CI_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_CI_CLIENT_ID: ${{ secrets.AZURE_CI_CLIENT_ID }}
   USE_AZURE: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
 
 jobs:
