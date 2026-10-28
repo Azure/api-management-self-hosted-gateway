@@ -123,7 +123,7 @@ jobs:
       if: always()
 
     - name: Show Logs for Self-Hosted Gateway
-      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway
+      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway --tail=100
       if: always()
 
   deploy-azure-ad:
@@ -236,5 +236,5 @@ jobs:
       if: always()
 
     - name: Show Logs for Self-Hosted Gateway
-      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway
+      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway --tail=100
       if: always()
