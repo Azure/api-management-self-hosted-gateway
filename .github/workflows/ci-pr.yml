@@ -6,11 +6,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write
   contents: read
 
 env:
   HELM_DOCS_VERSION: "1.14.2"
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_CI_CLIENT_ID: ${{ secrets.AZURE_CI_CLIENT_ID }}
+  USE_AZURE: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
 
 jobs:
   validate-helm-docs:
@@ -66,6 +69,9 @@ jobs:
   deploy-helm:
     runs-on: ${{ matrix.architecture == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     needs: [lint-helm, validate-helm-docs]
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -89,6 +95,41 @@ jobs:
       uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
       with:
         fetch-depth: 0
+
+    - name: Authenticate to Azure
+      if: env.USE_AZURE == 'true'
+      uses: azure/login@8216e11d8cd9b42fe925c852af8e76311ff067ac # v2
+      with:
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ env.AZURE_CI_CLIENT_ID }}
+        audience: api://AzureADTokenExchange
+
+    - name: Get gateway configuration
+      id: fetched-secrets
+      shell: bash
+      env:
+        AZURE_KEY_VAULT_NAME: ${{ vars.AZURE_KEY_VAULT_NAME }}
+      run: |
+        set -euo pipefail
+        if [[ "$USE_AZURE" != "true" ]]; then
+          echo "Running credential-free chart tests for this event."
+          printf 'configurationUrl=xyz.configuration.azure-api.net\ngatewayToken=xyz\n' >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        configuration_url=$(az keyvault secret show --name Gateway-Configuration-Url --vault-name "$AZURE_KEY_VAULT_NAME" --query value --output tsv)
+        gateway_token=$(az keyvault secret show --name Gateway-Token --vault-name "$AZURE_KEY_VAULT_NAME" --query value --output tsv)
+        echo "::add-mask::$configuration_url"
+        echo "::add-mask::$gateway_token"
+        if [[ -z "$configuration_url" || -z "$gateway_token" ]]; then
+          echo "::error::Gateway-Configuration-Url and Gateway-Token must not be empty."
+          exit 1
+        fi
+        if [[ "$configuration_url" == *$'\n'* || "$configuration_url" == *$'\r'* || "$gateway_token" == *$'\n'* || "$gateway_token" == *$'\r'* ]]; then
+          echo "::error::Gateway-Configuration-Url and Gateway-Token must be single-line values."
+          exit 1
+        fi
+        printf 'configurationUrl=%s\ngatewayToken=%s\n' "$configuration_url" "$gateway_token" >> "$GITHUB_OUTPUT"
 
     - name: Helm install
       uses: Azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
@@ -129,15 +170,21 @@ jobs:
       run: kubectl create ns apim-gateway
 
     - name: Template Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set image.tag=2.13.0 --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="xyz" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
+      env:
+        GATEWAY_CONFIG_URL: ${{ steps.fetched-secrets.outputs.configurationUrl }}
+        GATEWAY_TOKEN: ${{ steps.fetched-secrets.outputs.gatewayToken }}
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set-string gateway.configuration.uri="$GATEWAY_CONFIG_URL" --set-string gateway.auth.key="$GATEWAY_TOKEN" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --dry-run
 
     - name: Install Helm chart
-      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set image.tag=2.13.0 --set gateway.configuration.uri="xyz.configuration.azure-api.net" --set gateway.auth.key="xyz" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
+      env:
+        GATEWAY_CONFIG_URL: ${{ steps.fetched-secrets.outputs.configurationUrl }}
+        GATEWAY_TOKEN: ${{ steps.fetched-secrets.outputs.gatewayToken }}
+      run: helm install azure-api-management-gateway ./helm-charts/azure-api-management-gateway --namespace apim-gateway --set-string gateway.configuration.uri="$GATEWAY_CONFIG_URL" --set-string gateway.auth.key="$GATEWAY_TOKEN" --set highAvailability.enabled=${{ matrix.enableHighAvailability }} --set gateway.deployment.strategy.type=Recreate --values ./testing/test-config.yml --wait --timeout 10m0s
 
     - name: Show Kubernetes resources
       run: kubectl get all --namespace apim-gateway
       if: always()
 
     - name: Show Logs for Self-Hosted Gateway
-      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway
+      run: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway --tail=100
       if: always()

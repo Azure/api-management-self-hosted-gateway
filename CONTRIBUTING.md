@@ -37,6 +37,11 @@ If you prefer to update documentation manually:
 
 The CI workflow will validate that the README is up-to-date with the values.yaml file.
 
+## CI Federation Setup
+
+See the [CI federation setup guide](docs/eng/ci-federation.md) for Azure identity,
+repository secret/variable, and federated credential configuration.
+
 ## Release Process
 
 ### Releasing a New Helm Chart Version
