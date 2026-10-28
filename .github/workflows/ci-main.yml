@@ -17,26 +17,7 @@ env:
   GATEWAY_AZURE_AD_CLIENT_ID: ${{ vars.GATEWAY_AZURE_AD_CLIENT_ID }}
 
 jobs:
-  validate-azure-configuration:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Validate Azure configuration
-      shell: bash
-      env:
-        AZURE_KEY_VAULT_NAME: ${{ vars.AZURE_KEY_VAULT_NAME }}
-        GATEWAY_NAME: ${{ vars.GATEWAY_NAME }}
-      run: |
-        missing=0
-        for name in AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID AZURE_CI_CLIENT_ID AZURE_KEY_VAULT_NAME GATEWAY_NAME GATEWAY_AZURE_AD_TENANT_ID GATEWAY_AZURE_AD_CLIENT_ID; do
-          if [[ -z "$(printenv "$name")" ]]; then
-            echo "::error::Set the $name repository variable. See CONTRIBUTING.md for CI federation setup."
-            missing=1
-          fi
-        done
-        exit "$missing"
-
   deploy-gateway-token:
-    needs: validate-azure-configuration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -134,7 +115,6 @@ jobs:
       if: always()
 
   deploy-azure-ad:
-    needs: validate-azure-configuration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
