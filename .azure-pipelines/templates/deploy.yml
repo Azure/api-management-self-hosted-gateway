@@ -1,0 +1,112 @@
+parameters:
+  - name: architectures
+    type: object
+    default: [amd64]
+  - name: arm64Pool
+    type: string
+    default: apim-gateway-linux-arm64
+  - name: authenticationTypes
+    type: object
+    default: [GatewayToken]
+  - name: useAzure
+    type: boolean
+    default: false
+  - name: azureServiceConnection
+    type: string
+    default: apim-gateway-ci
+  - name: dependsOn
+    type: object
+    default: []
+  - name: highAvailability
+    type: object
+    default: ['false', 'true']
+  - name: kubernetesVersions
+    type: object
+    default:
+      - version: v1.36
+        image: kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
+      - version: v1.35
+        image: kindest/node:v1.35.5@sha256:ce977ae6d65918d0b58a5f8b5e940429c2ce42fa3a5619ec2bbc60b949c0ac95
+      - version: v1.34
+        image: kindest/node:v1.34.8@sha256:02722c2dedddcfc00febf5d27fbeb9b7b2c14294c82109ff4a85d89ac9ba3256
+      - version: v1.33
+        image: kindest/node:v1.33.12@sha256:3f5c8443c620245e4d355cfe09e96a91ead32ceaa569d3f1ca9edf0cb2fe2ff4
+
+jobs:
+  - ${{ each architecture in parameters.architectures }}:
+    - ${{ each authenticationType in parameters.authenticationTypes }}:
+      - ${{ each kubernetes in parameters.kubernetesVersions }}:
+        - ${{ each ha in parameters.highAvailability }}:
+          - job: deploy_${{ architecture }}_${{ authenticationType }}_${{ replace(kubernetes.version, '.', '_') }}_ha_${{ ha }}
+            displayName: Deploy ${{ kubernetes.version }} / ${{ architecture }} / ${{ authenticationType }} / HA ${{ ha }}
+            dependsOn: ${{ parameters.dependsOn }}
+            timeoutInMinutes: 30
+            ${{ if parameters.useAzure }}:
+              condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+            pool:
+              ${{ if eq(architecture, 'arm64') }}:
+                name: ${{ parameters.arm64Pool }}
+                demands:
+                  - Agent.OS -equals Linux
+                  - Agent.OSArchitecture -equals ARM64
+              ${{ else }}:
+                vmImage: ubuntu-24.04
+            steps:
+              - checkout: self
+                clean: true
+                persistCredentials: false
+              - template: tools.yml
+                parameters:
+                  kubernetesVersion: ${{ kubernetes.version }}
+              - ${{ if parameters.useAzure }}:
+                - task: AzureKeyVault@2
+                  displayName: Fetch gateway credentials
+                  inputs:
+                    azureSubscription: ${{ parameters.azureServiceConnection }}
+                    KeyVaultName: $(AZURE_KEY_VAULT_NAME)
+                    ${{ if eq(authenticationType, 'GatewayToken') }}:
+                      SecretsFilter: Gateway-Configuration-Url,Gateway-Token
+                    ${{ else }}:
+                      SecretsFilter: Gateway-Configuration-Url,Azure-Ad-App-Secret
+                    RunAsPreJob: false
+              - bash: |
+                  set -euo pipefail
+                  actual_architecture="$(uname -m)"
+                  case "$EXPECTED_ARCHITECTURE:$actual_architecture" in
+                    amd64:x86_64|arm64:aarch64|arm64:arm64) ;;
+                    *) echo "Expected $EXPECTED_ARCHITECTURE agent, got $actual_architecture" >&2; exit 1 ;;
+                  esac
+                  docker info > /dev/null
+                displayName: Verify agent architecture and Docker
+                env:
+                  EXPECTED_ARCHITECTURE: ${{ architecture }}
+              - bash: |
+                  set -euo pipefail
+                  kind create cluster --name chart-testing --image "$KIND_IMAGE" \
+                    --config testing/kind-cluster.yml --wait 120s
+                displayName: Create Kind cluster
+                env:
+                  KIND_IMAGE: ${{ kubernetes.image }}
+              - bash: kubectl version
+                displayName: Show Kubernetes version
+              - bash: kubectl get nodes -o wide
+                displayName: Show Kubernetes nodes
+              - bash: kubectl describe nodes/chart-testing-control-plane nodes/chart-testing-worker
+                displayName: Describe Kubernetes nodes
+              - bash: kubectl create namespace apim-gateway
+                displayName: Create gateway namespace
+              - template: helm-install.yml
+                parameters:
+                  authenticationType: ${{ authenticationType }}
+                  highAvailability: ${{ ha }}
+                  useAzure: ${{ parameters.useAzure }}
+              - bash: kubectl get all --namespace apim-gateway
+                displayName: Show Kubernetes resources
+                condition: always()
+              - bash: kubectl logs -l app.kubernetes.io/name=azure-api-management-gateway --namespace apim-gateway --all-containers=true --tail=100
+                displayName: Show gateway logs
+                condition: always()
+                continueOnError: true
+              - bash: kind delete cluster --name chart-testing
+                displayName: Delete Kind cluster
+                condition: always()
