@@ -1,0 +1,46 @@
+jobs:
+  - job: validate_helm_docs
+    displayName: Validate Helm documentation
+    pool:
+      vmImage: ubuntu-24.04
+    steps:
+      - checkout: self
+        persistCredentials: false
+      - bash: |
+          set -euo pipefail
+          install_dir="$(mktemp -d)"
+          trap 'rm -rf "$install_dir"' EXIT
+          curl -fsSL "https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz" -o "$install_dir/helm-docs.tar.gz"
+          tar -xzf "$install_dir/helm-docs.tar.gz" -C "$install_dir" helm-docs
+          (cd helm-charts/azure-api-management-gateway && "$install_dir/helm-docs")
+          if ! git diff --exit-code -- helm-charts/azure-api-management-gateway/README.md; then
+            echo "##vso[task.logissue type=error]Run helm-docs in helm-charts/azure-api-management-gateway and commit the generated README.md."
+            exit 1
+          fi
+        displayName: Regenerate and check chart README
+        env:
+          HELM_DOCS_VERSION: 1.14.2
+
+  - job: lint_helm
+    displayName: Lint Helm chart
+    pool:
+      vmImage: ubuntu-24.04
+    steps:
+      - checkout: self
+        persistCredentials: false
+      - template: tools.yml
+      - bash: |
+          set -euo pipefail
+          helm lint helm-charts/azure-api-management-gateway \
+            --set gateway.configuration.uri=xyz.configuration.azure-api.net \
+            --set gateway.auth.key="GatewayKey xyz"
+          helm lint helm-charts/azure-api-management-gateway \
+            --set gateway.configuration.uri=xyz.configuration.azure-api.net \
+            --set gateway.auth.type=AzureAdApp \
+            --set gateway.name=gateway-name \
+            --set gateway.auth.azureAd.tenant.id=ci-tenant-id \
+            --set gateway.auth.azureAd.app.id=ci-app-id \
+            --set gateway.auth.azureAd.app.secret=xyz
+        displayName: Lint GatewayToken and AzureAdApp authentication
+      - bash: bash testing/test-pipeline-deploy.sh
+        displayName: Check deployment script behavior

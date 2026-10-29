@@ -40,7 +40,7 @@ jobs:
               r"(sha256:[0-9a-f]+)`",
               body,
           ):
-              images[".".join(version.split(".")[:2])] = f"kindest/node:v{version}@{digest}"
+              images["v" + ".".join(version.split(".")[:2])] = f"kindest/node:v{version}@{digest}"
 
           if len(images) < 4:
               raise SystemExit("The latest Kind release did not publish four node images")
@@ -82,6 +82,33 @@ jobs:
                   content,
               )
               path.write_text(content)
+
+          path = Path(".azure-pipelines/templates/deploy.yml")
+          content = path.read_text()
+          azure_entries = "\n".join(
+              f"      - version: {version}\n"
+              f"        image: {images[version]}"
+              for version in selected
+          )
+          content, count = re.subn(
+              r"(  - name: kubernetesVersions\n    type: object\n    default:\n)"
+              r"(?:      - version:.*\n        image:.*\n)+",
+              lambda match: match[1] + azure_entries + "\n",
+              content,
+          )
+          if count != 1:
+              raise SystemExit("Could not find the Azure Pipelines Kind matrix")
+          path.write_text(content)
+
+          path = Path(".azure-pipelines/templates/tools.yml")
+          content, count = re.subn(
+              r"(  - name: kindVersion\n    type: string\n    default: )v\d+\.\d+\.\d+",
+              lambda match: match[1] + release["tag_name"],
+              path.read_text(),
+          )
+          if count != 1:
+              raise SystemExit("Could not find the Azure Pipelines Kind CLI version")
+          path.write_text(content)
           PY
 
       - name: Create pull request
@@ -96,7 +123,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B "${branch}"
-          git add .github/workflows .github/skills/update-kubernetes-images
+          git add .github/workflows .github/skills/update-kubernetes-images .azure-pipelines
           git commit -m "chore: update Kubernetes CI images"
           git push --force-with-lease origin "${branch}"
           if ! gh pr view "${branch}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then

@@ -1,0 +1,35 @@
+name: helm-main-$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+pr: none
+
+parameters:
+  - name: azureServiceConnection
+    type: string
+    default: apim-gateway-ci
+  - name: variableGroups
+    type: object
+    default: []
+
+stages:
+  - stage: Validate
+    displayName: Validate Helm chart
+    jobs:
+      - template: templates/validate.yml
+  - stage: Deploy
+    displayName: Test authenticated gateway deployments
+    dependsOn: Validate
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    variables:
+      - ${{ each group in parameters.variableGroups }}:
+        - group: ${{ group }}
+    jobs:
+      - template: templates/deploy.yml
+        parameters:
+          authenticationTypes: [GatewayToken, AzureAdApp]
+          useAzure: true
+          azureServiceConnection: ${{ parameters.azureServiceConnection }}
