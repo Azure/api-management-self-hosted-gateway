@@ -42,5 +42,3 @@ jobs:
             --set gateway.auth.azureAd.app.id=ci-app-id \
             --set gateway.auth.azureAd.app.secret=xyz
         displayName: Lint GatewayToken and AzureAdApp authentication
-      - bash: bash testing/test-pipeline-deploy.sh
-        displayName: Check deployment script behavior

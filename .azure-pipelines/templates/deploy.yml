@@ -77,35 +77,29 @@ jobs:
                     *) echo "Expected $EXPECTED_ARCHITECTURE agent, got $actual_architecture" >&2; exit 1 ;;
                   esac
                   docker info > /dev/null
-                  kind create cluster --name chart-testing --image "$KIND_IMAGE" \
-                    --config testing/kind-cluster.yml --wait 120s
-                  kubectl version
-                  kubectl get nodes -o wide
-                  kubectl describe nodes/chart-testing-control-plane nodes/chart-testing-worker
-                  kubectl create namespace apim-gateway
-                displayName: Create Kind cluster
+                displayName: Verify agent architecture and Docker
                 env:
                   EXPECTED_ARCHITECTURE: ${{ architecture }}
-                  KIND_IMAGE: ${{ kubernetes.image }}
-              - bash: bash .azure-pipelines/scripts/deploy.sh
-                displayName: Render and install Helm chart
+              - bash: |
+                  set -euo pipefail
+                  kind create cluster --name chart-testing --image "$KIND_IMAGE" \
+                    --config testing/kind-cluster.yml --wait 120s
+                displayName: Create Kind cluster
                 env:
-                  AUTHENTICATION_TYPE: ${{ authenticationType }}
-                  HIGH_AVAILABILITY: ${{ ha }}
-                  ${{ if parameters.useAzure }}:
-                    USE_AZURE: 'true'
-                    GATEWAY_CONFIGURATION_URL: $(Gateway-Configuration-Url)
-                    ${{ if eq(authenticationType, 'GatewayToken') }}:
-                      GATEWAY_CREDENTIAL: $(Gateway-Token)
-                    ${{ else }}:
-                      GATEWAY_CREDENTIAL: $(Azure-Ad-App-Secret)
-                      GATEWAY_NAME: $(GATEWAY_NAME)
-                      AZURE_TENANT_ID: $(AZURE_TENANT_ID)
-                      AZURE_GATEWAY_CLIENT_ID: $(AZURE_GATEWAY_CLIENT_ID)
-                  ${{ else }}:
-                    USE_AZURE: 'false'
-                    GATEWAY_CONFIGURATION_URL: xyz.configuration.azure-api.net
-                    GATEWAY_CREDENTIAL: xyz
+                  KIND_IMAGE: ${{ kubernetes.image }}
+              - bash: kubectl version
+                displayName: Show Kubernetes version
+              - bash: kubectl get nodes -o wide
+                displayName: Show Kubernetes nodes
+              - bash: kubectl describe nodes/chart-testing-control-plane nodes/chart-testing-worker
+                displayName: Describe Kubernetes nodes
+              - bash: kubectl create namespace apim-gateway
+                displayName: Create gateway namespace
+              - template: helm-install.yml
+                parameters:
+                  authenticationType: ${{ authenticationType }}
+                  highAvailability: ${{ ha }}
+                  useAzure: ${{ parameters.useAzure }}
               - bash: kubectl get all --namespace apim-gateway
                 displayName: Show Kubernetes resources
                 condition: always()

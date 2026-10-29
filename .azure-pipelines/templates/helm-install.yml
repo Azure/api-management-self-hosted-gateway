@@ -1,0 +1,106 @@
+parameters:
+  - name: authenticationType
+    type: string
+    values: [GatewayToken, AzureAdApp]
+  - name: highAvailability
+    type: string
+    values: ['false', 'true']
+  - name: useAzure
+    type: boolean
+  - name: phases
+    type: object
+    default:
+      - displayName: Render Helm chart
+        arguments: --dry-run --hide-secret
+        wait: false
+      - displayName: Install Helm chart
+        arguments: --timeout 10m0s
+        wait: true
+
+steps:
+  - task: Bash@3
+    displayName: Prepare private Helm value files
+    inputs:
+      targetType: inline
+      script: |
+        set -euo pipefail
+        umask 077
+        values_dir="$(mktemp -d "$AGENT_TEMPDIRECTORY/gateway-helm-values.XXXXXX")"
+        echo "##vso[task.setvariable variable=helmValuesDirectory]$values_dir"
+        names=(GATEWAY_CONFIGURATION_URL GATEWAY_CREDENTIAL)
+        if [[ "$AUTHENTICATION_TYPE" == AzureAdApp ]]; then
+          names+=(GATEWAY_NAME AZURE_TENANT_ID AZURE_GATEWAY_CLIENT_ID)
+        fi
+        for name in "${names[@]}"; do
+          value="${!name:-}"
+          if [[ -z "$value" || "$value" == '$('* || "$value" == *$'\n'* || "$value" == *$'\r'* ]]; then
+            echo "##vso[task.logissue type=error]$name must be configured with a non-empty, single-line value."
+            exit 1
+          fi
+          printf '%s' "$value" > "$values_dir/$name"
+        done
+    env:
+      AUTHENTICATION_TYPE: ${{ parameters.authenticationType }}
+      ${{ if parameters.useAzure }}:
+        GATEWAY_CONFIGURATION_URL: $(Gateway-Configuration-Url)
+        ${{ if eq(parameters.authenticationType, 'GatewayToken') }}:
+          GATEWAY_CREDENTIAL: $(Gateway-Token)
+        ${{ else }}:
+          GATEWAY_CREDENTIAL: $(Azure-Ad-App-Secret)
+          GATEWAY_NAME: $(GATEWAY_NAME)
+          AZURE_TENANT_ID: $(AZURE_TENANT_ID)
+          AZURE_GATEWAY_CLIENT_ID: $(AZURE_GATEWAY_CLIENT_ID)
+      ${{ else }}:
+        GATEWAY_CONFIGURATION_URL: xyz.configuration.azure-api.net
+        GATEWAY_CREDENTIAL: xyz
+        GATEWAY_NAME: gateway-name
+        AZURE_TENANT_ID: tenant-id
+        AZURE_GATEWAY_CLIENT_ID: application-id
+  - ${{ each phase in parameters.phases }}:
+    - task: HelmDeploy@1
+      displayName: ${{ phase.displayName }}
+      inputs:
+        connectionType: None
+        namespace: apim-gateway
+        command: install
+        chartType: FilePath
+        chartPath: $(Build.SourcesDirectory)/helm-charts/azure-api-management-gateway
+        releaseName: azure-api-management-gateway
+        valueFile: $(Build.SourcesDirectory)/testing/test-config.yml
+        overrideValues: |
+          gateway.auth.type=${{ parameters.authenticationType }}
+          highAvailability.enabled=${{ parameters.highAvailability }}
+          gateway.deployment.strategy.type=Recreate
+        waitForExecution: ${{ and(parameters.useAzure, phase.wait) }}
+        publishPipelineMetadata: false
+        ${{ if eq(parameters.authenticationType, 'GatewayToken') }}:
+          arguments: >-
+            ${{ phase.arguments }}
+            --set-file "gateway.configuration.uri=$(helmValuesDirectory)/GATEWAY_CONFIGURATION_URL"
+            --set-file "gateway.auth.key=$(helmValuesDirectory)/GATEWAY_CREDENTIAL"
+        ${{ else }}:
+          arguments: >-
+            ${{ phase.arguments }}
+            --set-file "gateway.configuration.uri=$(helmValuesDirectory)/GATEWAY_CONFIGURATION_URL"
+            --set-file "gateway.auth.azureAd.app.secret=$(helmValuesDirectory)/GATEWAY_CREDENTIAL"
+            --set-file "gateway.name=$(helmValuesDirectory)/GATEWAY_NAME"
+            --set-file "gateway.auth.azureAd.tenant.id=$(helmValuesDirectory)/AZURE_TENANT_ID"
+            --set-file "gateway.auth.azureAd.app.id=$(helmValuesDirectory)/AZURE_GATEWAY_CLIENT_ID"
+  - ${{ if not(parameters.useAzure) }}:
+    - bash: kubectl get deployment azure-api-management-gateway --namespace apim-gateway
+      displayName: Verify credential-free deployment exists
+  - task: Bash@3
+    displayName: Remove private Helm value files
+    condition: always()
+    inputs:
+      targetType: inline
+      script: |
+        set -euo pipefail
+        if [[ -n "${VALUES_DIRECTORY:-}" && "$VALUES_DIRECTORY" != '$('* ]]; then
+          case "$VALUES_DIRECTORY" in
+            "$AGENT_TEMPDIRECTORY"/gateway-helm-values.*) rm -rf -- "$VALUES_DIRECTORY" ;;
+            *) echo "Refusing to remove unexpected Helm values directory" >&2; exit 1 ;;
+          esac
+        fi
+    env:
+      VALUES_DIRECTORY: $(helmValuesDirectory)

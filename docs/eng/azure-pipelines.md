@@ -111,8 +111,14 @@ only the secrets required by each authentication mode and exposes them as
 secret task variables. Secrets are mapped explicitly into the deployment
 step's environment, validated as non-empty single-line values, and passed to
 Helm using private temporary files so commas and backslashes are preserved.
-The temporary files are removed on exit; secret manifests are hidden in the
-dry run. Missing credentials fail the job rather than selecting dummy values.
+The `helm-install.yml` step template uses separate `HelmDeploy@1` tasks to render
+and install the chart against Kind's current kubeconfig (`connectionType: None`).
+Pipeline metadata publishing is disabled, and only file paths, not credential
+values, are included in task arguments. An inline `Bash@3` task prepares the
+private value files; an always-run cleanup task removes them even after failure.
+Secret manifests are hidden in the dry run. Missing credentials fail the job
+rather than selecting dummy values. Cluster creation, version reporting, node
+listing, node descriptions, and namespace creation each have their own step.
 
 These are standard Azure Pipelines definitions, not OneBranch pipelines.
 OneBranch-specific `extends` templates, `pool.type`/`hostArchitecture` settings,
@@ -137,9 +143,9 @@ OneBranch or depending on an internal source repository.
    them. Update the image updater to stop editing the retired workflows.
 
 For local checks, run the two Helm lint commands from the contributor
-instructions, `bash -n .azure-pipelines/scripts/deploy.sh`, and
-`bash testing/test-pipeline-deploy.sh`. Azure DevOps template expansion and real
-Key Vault/Kind deployments must also be verified in the configured pipelines.
+instructions, parse the pipeline YAML, and check inline Bash syntax. Azure
+DevOps template expansion and real Key Vault/Kind deployments must also be
+verified in the configured pipelines, including task execution on ARM64 agents.
 
 References: [GitHub integration and fork settings](https://learn.microsoft.com/azure/devops/pipelines/repos/github),
 [resource approvals and branch control](https://learn.microsoft.com/azure/devops/pipelines/process/approvals),
