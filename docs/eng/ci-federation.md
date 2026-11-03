@@ -1,5 +1,10 @@
 # CI Federation Setup
 
+This guide covers the existing GitHub Actions workflows, which remain enabled
+during migration. Azure Pipelines uses a separate workload identity service
+connection; see the [Azure Pipelines setup guide](azure-pipelines.md). GitHub
+Actions federated credentials cannot be reused as Azure Pipelines credentials.
+
 The main CI workflow and trusted PR deployments use GitHub Actions OIDC to
 authenticate to Azure without a CI client secret. Both main deployment matrices
 and the PR deployment matrix use the same federated identity to read gateway

@@ -1,0 +1,44 @@
+parameters:
+  - name: kubernetesVersion
+    type: string
+    default: ''
+  - name: kindVersion
+    type: string
+    default: v0.32.0
+
+steps:
+  - bash: |
+      set -euo pipefail
+      case "$(uname -m)" in
+        x86_64) architecture=amd64 ;;
+        aarch64|arm64) architecture=arm64 ;;
+        *) echo "Unsupported agent architecture: $(uname -m)" >&2; exit 1 ;;
+      esac
+      tools_dir="$(Agent.TempDirectory)/gateway-ci-bin"
+      mkdir -p "$tools_dir"
+      download_dir="$(mktemp -d)"
+      trap 'rm -rf "$download_dir"' EXIT
+      cd "$download_dir"
+      archive="helm-v${HELM_VERSION}-linux-${architecture}.tar.gz"
+      curl -fsSLO "https://get.helm.sh/$archive"
+      curl -fsSLO "https://get.helm.sh/$archive.sha256sum"
+      sha256sum --check "$archive.sha256sum"
+      tar -xzf "$archive"
+      install -m 755 "linux-${architecture}/helm" "$tools_dir/helm"
+      if [[ -n "$KUBERNETES_VERSION" ]]; then
+        curl -fsSL "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-${architecture}" -o kind
+        curl -fsSL "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-${architecture}.sha256sum" -o kind.sha256sum
+        echo "$(cut -d ' ' -f 1 kind.sha256sum)  kind" | sha256sum --check
+        install -m 755 kind "$tools_dir/kind"
+        curl -fsSLO "https://dl.k8s.io/release/${KUBERNETES_VERSION}.0/bin/linux/${architecture}/kubectl"
+        curl -fsSLO "https://dl.k8s.io/release/${KUBERNETES_VERSION}.0/bin/linux/${architecture}/kubectl.sha256"
+        echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+        install -m 755 kubectl "$tools_dir/kubectl"
+      fi
+      echo "##vso[task.prependpath]$tools_dir"
+      "$tools_dir/helm" version --short
+    displayName: Install pinned Helm and Kubernetes tools
+    env:
+      HELM_VERSION: 3.19.0
+      KIND_VERSION: ${{ parameters.kindVersion }}
+      KUBERNETES_VERSION: ${{ parameters.kubernetesVersion }}

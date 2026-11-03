@@ -1,0 +1,21 @@
+name: helm-pr-$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: arm64Pool
+    type: string
+    default: apim-gateway-linux-arm64
+
+jobs:
+  - template: templates/validate.yml
+  - template: templates/deploy.yml
+    parameters:
+      architectures: [amd64, arm64]
+      arm64Pool: ${{ parameters.arm64Pool }}
+      dependsOn: [validate_helm_docs, lint_helm]

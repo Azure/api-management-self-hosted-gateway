@@ -42,6 +42,13 @@ The CI workflow will validate that the README is up-to-date with the values.yaml
 See the [CI federation setup guide](docs/eng/ci-federation.md) for Azure identity,
 repository secret/variable, and federated credential configuration.
 
+## Azure Pipelines Migration
+
+PR and main CI definitions are also available in `.azure-pipelines/`. GitHub
+Actions remains enabled during the migration. See the
+[Azure Pipelines setup and cutover guide](docs/eng/azure-pipelines.md) for agent
+pools, service connections, pipeline variables, and differences in PR coverage.
+
 ## Release Process
 
 ### Releasing a New Helm Chart Version
